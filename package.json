@@ -14,6 +14,7 @@
     "@esbuild-plugins/node-modules-polyfill": "^0.1.4",
     "@sveltejs/vite-plugin-svelte": "^1.1.0",
     "@tsconfig/svelte": "^3.0.0",
+    "@types/lodash": "^4.14.189",
     "svelte": "^3.52.0",
     "svelte-check": "^2.9.2",
     "svelte-preprocess": "^4.10.7",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "bip39": "^3.0.4",
+    "lodash": "^4.17.21",
     "tf-svelte-bulma-wc": "^1.0.0",
     "tf-svelte-rx-forms": "^1.0.0",
     "ts-rmb-http-client": "^1.0.7"
