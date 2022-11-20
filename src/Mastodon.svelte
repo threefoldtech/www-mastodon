@@ -4,12 +4,12 @@
   import { Tabs, Input, CheckBox } from "tf-svelte-bulma-wc";
   import { fb, validators } from "tf-svelte-rx-forms";
   import { validateMnemonic } from "bip39";
+  import { Session } from "./utils";
 </script>
 
 <script lang="ts">
-  let active = "credentials";
+  let active = "basic";
 
-  const enableSShKey = fb.control(false);
   const loginForm = fb.group({
     mnemonics: [
       "",
@@ -22,14 +22,31 @@
         },
       ],
     ],
+    enableSShKey: [false],
     sshKey: ["", [validators.required("Public SSH Key is required.")]],
   });
 
-  $: enableSShKey$ = $enableSShKey;
   $: loginForm$ = $loginForm;
   $: showConfigs =
     loginForm$.valid ||
-    (loginForm$.value.mnemonics.valid && !enableSShKey$.value);
+    (loginForm$.value.mnemonics.valid && !loginForm$.value.enableSShKey.value);
+
+  let __init = false;
+  $: {
+    loginForm$;
+
+    if (__init) {
+      Session.write(Session.Keys.Credentials, loginForm.value);
+    } else {
+      __init = true;
+      const value = Session.read(Session.Keys.Credentials);
+      if (value) {
+        loginForm.get("mnemonics").setValue(value.mnemonics);
+        loginForm.get("enableSShKey").setValue(value.enableSShKey);
+        loginForm.get("sshKey").setValue(value.sshKey);
+      }
+    }
+  }
 </script>
 
 <b-box>
@@ -50,6 +67,7 @@
     <Input
       label="Mnemonics"
       placeholder="Mnemonics"
+      type="password"
       controller={loginForm.get("mnemonics")}
     />
 
@@ -60,8 +78,8 @@
           type="textarea"
           placeholder="Your public SSH Key"
           controller={loginForm.get("sshKey")}
-          disabled={!enableSShKey$.value}
-          validation={enableSShKey$.value}
+          disabled={!loginForm$.value.enableSShKey.value}
+          validation={loginForm$.value.enableSShKey.value}
         />
       </div>
 
@@ -70,7 +88,7 @@
           tooltip="On disable the deployed solutions'll be inaccessible."
           flow="left"
         >
-          <CheckBox controller={enableSShKey} />
+          <CheckBox controller={loginForm.get("enableSShKey")} />
         </b-tooltip>
       </div>
     </div>
