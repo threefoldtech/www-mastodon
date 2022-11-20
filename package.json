@@ -18,5 +18,10 @@
     "tslib": "^2.4.0",
     "typescript": "^4.6.4",
     "vite": "^3.2.3"
+  },
+  "dependencies": {
+    "tf-svelte-bulma-wc": "^1.0.0",
+    "tf-svelte-rx-forms": "^1.0.0",
+    "ts-rmb-http-client": "^1.0.7"
   }
 }
