@@ -98,9 +98,11 @@
 
   <Credentials {mastodon} show={active === "credentials"} />
 
-  <section style:display={active === "basic" ? "initial" : "none"}>
-    basic
-  </section>
+  {#if showConfigs}
+    <section style:display={active === "basic" ? "initial" : "none"}>
+      basic
+    </section>
 
-  <Advanced {mastodon} show={active === "advanced"} />
+    <Advanced {mastodon} show={active === "advanced"} />
+  {/if}
 </b-box>

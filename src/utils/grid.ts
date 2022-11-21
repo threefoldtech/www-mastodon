@@ -1,6 +1,10 @@
 const { GridClient, NetworkEnv, Nodes } = window.grid3_client;
 import { HTTPMessageBusClient } from "ts-rmb-http-client";
-import type { GridClient as GC, FilterOptions } from "grid3_client/dist/node";
+import type {
+  GridClient as GC,
+  FilterOptions,
+  NodeInfo,
+} from "grid3_client/dist/node";
 
 export function getGrid(mnemonic: string) {
   const grid = new GridClient(
@@ -18,13 +22,16 @@ export function getNodes(grid: GC) {
   return new Nodes(graphql, rmbProxy, rmbClient);
 }
 
-export function findNodes(mnemonic: string, filters: FilterOptions) {
-  let _grid: GC;
-  return getGrid(mnemonic)
-    .then((grid) => (_grid = grid))
-    .then(() => _grid.twins.get_my_twin_id())
-    .then((availableFor) => {
-      return getNodes(_grid).filterNodes({ ...filters, availableFor });
+export async function findNodes(
+  mnemonic: string,
+  filters: FilterOptions
+): Promise<NodeInfo[]> {
+  const grid = await getGrid(mnemonic);
+  const nodes = getNodes(grid);
+  return nodes
+    .filterNodes({
+      availableFor: await grid.twins.get_my_twin_id(),
+      ...filters,
     })
     .catch(() => []);
 }
