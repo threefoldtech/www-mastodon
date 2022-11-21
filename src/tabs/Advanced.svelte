@@ -4,6 +4,7 @@
   import type { MastodonForm } from "../Mastodon.svelte";
   import { Input, CheckBox } from "tf-svelte-bulma-wc";
   import SelectNodeId from "../components/SelectNodeId.svelte";
+  import SelectGateway from "../components/SelectGateway.svelte";
 
   export let show: boolean;
   export let mastodon: MastodonForm;
@@ -11,12 +12,6 @@
 
 {#if mastodon}
   <section style:display={show ? "initial" : "none"}>
-    <Input
-      label="Name"
-      placeholder="Mastodon Instance Name"
-      controller={mastodon.get("name")}
-    />
-
     <Input
       label="CPU (vCores)"
       placeholder="CPU in vCores"
@@ -45,6 +40,21 @@
     <CheckBox label="Public IPv4" controller={mastodon.get("ipv4")} />
     <CheckBox label="Public IPv6" controller={mastodon.get("ipv6")} />
 
+    <SelectGateway {mastodon} />
+
     <SelectNodeId {mastodon} />
+
+    <Input
+      label="Admin Username"
+      placeholder="Admin Username"
+      controller={mastodon.get("admin").get("username")}
+    />
+
+    <Input
+      label="Admin Password"
+      placeholder="Admin Password"
+      type="password"
+      controller={mastodon.get("admin").get("password")}
+    />
   </section>
 {/if}

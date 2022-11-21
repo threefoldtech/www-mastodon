@@ -11,16 +11,20 @@
   import type {
     FarmInfo,
     FilterOptions,
+    GridClient,
     NodeInfo,
   } from "grid3_client/dist/node";
+  import TFGridGqlClient, { Networks } from "tfgrid-gql";
 
   export let mastodon: MastodonForm;
   const controller = fb.control<number>(null, [
     validators.required("Node ID is required."),
   ]);
   const farmName = fb.control<string>(null);
+  const region = fb.control<string>(null);
   let nodes: NodeInfo[] = [];
   let farms: FarmInfo[] = [];
+  let regions: string[] = [];
 
   const loadNodes = debounce(
     async (
@@ -53,8 +57,14 @@
     1500
   );
 
-  async function loadFarms() {
-    const grid = await getGrid(mastodon.value.mnemonics);
+  //   async function loadRegions(grid: GridClient) {
+  //     const gql = new TFGridGqlClient(grid.network as unknown as Networks);
+  //     const countries = await gql.countries({ subregion: true });
+  //     regions = Array.from(new Set(countries.map((c) => c.subregion)));
+  //     regionLoaded = true;
+  //   }
+
+  async function loadFarms(grid: GridClient) {
     farms = await grid.capacity.getAllFarms();
     farmLoaded = true;
     loadNodes(f);
@@ -62,10 +72,15 @@
 
   let loading: boolean = false;
   let farmLoaded: boolean = false;
+  let regionLoaded: boolean = true;
   let unsubscribe: Unsubscriber;
   let f: any;
   onDestroy(() => unsubscribe?.());
-  onMount(loadFarms);
+  onMount(async () => {
+    const grid = await getGrid(mastodon.value.mnemonics);
+    // loadRegions(grid);
+    loadFarms(grid);
+  });
   onMount(() => {
     f = new FormGroup({
       cru: mastodon.get("cpu"),
@@ -75,8 +90,9 @@
       farmName,
     });
     unsubscribe = f.subscribe(() => {
-      if (farmLoaded) {
+      if (farmLoaded && regionLoaded) {
         loading = true;
+        mastodon.get("nodeId").setValue(null);
         loadNodes(f);
       }
     });
@@ -100,6 +116,17 @@
     loading={!farmLoaded}
     disabled={!farmLoaded}
   />
+
+  <!-- <Select
+    label="Select a region"
+    options={[{ label: "Select a region", value: null }].concat(
+      regions.map((r) => ({ label: r, value: r }))
+    )}
+    controller={region}
+    validation={false}
+    loading={!regionLoaded}
+    disabled={!regionLoaded}
+  /> -->
 
   <Select
     label="Select Node ID"

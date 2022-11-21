@@ -1,12 +1,14 @@
 <svelte:options tag="tf-mastodon" />
 
 <script context="module" lang="ts">
-  import { Tabs } from "tf-svelte-bulma-wc";
+  import { Tabs, btn } from "tf-svelte-bulma-wc";
   import { fb, validators } from "tf-svelte-rx-forms";
   import { validateMnemonic } from "bip39";
 
   import Credentials from "./tabs/Credentials.svelte";
   import Advanced from "./tabs/Advanced.svelte";
+  import { generateString, getGrid, deployVM } from "./utils";
+  import Basic from "./tabs/Basic.svelte";
 
   const mastodon = fb.group({
     mnemonics: [
@@ -19,12 +21,20 @@
           }
         },
       ],
+      [
+        async (ctrl) => {
+          try {
+            await getGrid(ctrl.value);
+          } catch {
+            return { message: "Couldn't load grid using these mnemonic." };
+          }
+        },
+      ],
     ],
-    enableSShKey: [false],
     sshKey: ["", [validators.required("Public SSH Key is required.")]],
 
     name: [
-      "",
+      generateString(15, "MD"),
       [
         validators.required("Mastodon instance's name is required."),
         validators.minLength("Name must be at least 2 chars.", 2),
@@ -67,27 +77,104 @@
     planetary: [true],
     ipv4: [false],
     ipv6: [true],
-    gateway: [""],
+    gateway: [null as number, [validators.required("Gateway is required.")]],
     nodeId: [null as number, [validators.required("Node ID is required.")]],
+
+    admin: fb.group({
+      email: [
+        "",
+        [
+          validators.required("Admin Email is required."),
+          validators.isEmail("Invalid email format.", { require_tld: true }),
+        ],
+      ],
+      username: [
+        "admin",
+        [
+          validators.required("Admin Username is required."),
+          validators.minLength("Username must be at least 2 chars.", 2),
+          validators.maxLength("Username can't pass 15 chars.", 15),
+        ],
+      ],
+      password: [
+        generateString(15),
+        [
+          validators.required("Admin Password is required."),
+          validators.minLength("Admin password must be at least 6 chars.", 6),
+          validators.maxLength("Admin Password can't pass 15 chars.", 15),
+        ],
+      ],
+    }),
   });
 
   export type MastodonForm = typeof mastodon;
 </script>
 
 <script lang="ts">
-  let active = "advanced";
+  let active = "credentials";
   $: mastodon$ = $mastodon;
-  $: showConfigs =
-    (mastodon$.value.mnemonics.valid && mastodon$.value.sshKey.valid) ||
-    (mastodon$.value.mnemonics.valid && !mastodon$.value.enableSShKey.value);
+  $: mnemonics = mastodon$.value.mnemonics;
+  $: sshKey = mastodon$.value.sshKey;
+  $: validCredentials = mnemonics.valid && sshKey.valid;
+
+  // let testedGrid: boolean = false;
+  // $: if (validCredentials) {
+  //   if (!testedGrid) {
+  //     mastodon.setDisabled(true);
+  //     getGrid(mnemonics.value)
+  //       .then(() => {
+  //         testedGrid = true;
+  //       })
+  //       .catch(() => {})
+  //       .finally(() => {
+  //         mastodon.setDisabled(false);
+  //       });
+  //   }
+  // } else {
+  //   if (testedGrid) testedGrid = false;
+  // }
+
+  // $: showConfigs = validCredentials && testedGrid;
+
+  async function onDeploy() {
+    console.log(mastodon.value);
+
+    // const { value } = mastodon;
+    // deployVM({
+    //   ...mastodon.value,
+    //   image: {
+    //     entryPoint: "/sbin/zinit init",
+    //     flist:
+    //       "https://hub.grid.tf/omda.3bot/mahmoudemmad-mastodon-latest.flist",
+    //   },
+    //   rootFsSize: value.disk,
+    // }).then(console.log);
+  }
 </script>
 
 <b-box>
+  <b-content>
+    <h2>Deploy a Mastodon Instance</h2>
+    <p>
+      Mastodon is free and open-source software for running self-hosted social
+      networking services. It has microblogging features similar to the Twitter
+      service, which are offered by a large number of independently run nodes,
+      known as instances, each with its own code of conduct, terms of service,
+      privacy options, and moderation policies. <a
+        href="https://library.threefold.me/info/manual/#/manual__weblets_mastodon"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Quick start documentation
+      </a>
+    </p>
+    <hr />
+  </b-content>
   <Tabs
     bind:active
     tabs={[
       { id: "credentials", label: "Credentials" },
-      ...(showConfigs
+      ...(validCredentials
         ? [
             { id: "basic", label: "Basic" },
             { id: "advanced", label: "Advanced" },
@@ -96,13 +183,22 @@
     ]}
   />
 
-  <Credentials {mastodon} show={active === "credentials"} />
+  <form on:submit|preventDefault={onDeploy}>
+    <Credentials {mastodon} show={active === "credentials"} />
 
-  {#if showConfigs}
-    <section style:display={active === "basic" ? "initial" : "none"}>
-      basic
-    </section>
+    {#if validCredentials}
+      <Basic {mastodon} show={active === "basic"} />
+      <Advanced {mastodon} show={active === "advanced"} />
+    {/if}
 
-    <Advanced {mastodon} show={active === "advanced"} />
-  {/if}
+    <b-btns align="right" class:mt-2={true}>
+      <button
+        use:btn={{ color: "primary" }}
+        type="submit"
+        disabled={!mastodon$.valid}
+      >
+        Deploy
+      </button>
+    </b-btns>
+  </form>
 </b-box>

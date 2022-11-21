@@ -2,11 +2,14 @@
 
 <script lang="ts">
   import type { MastodonForm } from "../Mastodon.svelte";
-  import { Input, CheckBox } from "tf-svelte-bulma-wc";
-  import { Session } from "../utils";
+  import { Input } from "tf-svelte-bulma-wc";
+  import { getGrid, Session } from "../utils";
+  import Qrcode from "../components/Qrcode.svelte";
+  import { onMount } from "svelte";
 
   export let show: boolean;
   export let mastodon: MastodonForm;
+  let twinId: number;
 
   let __init = false;
   $: mastodon$ = $mastodon;
@@ -21,11 +24,17 @@
         const value = Session.read(Session.Keys.Credentials);
         if (value) {
           mastodon.get("mnemonics").setValue(value.mnemonics);
-          mastodon.get("enableSShKey").setValue(value.enableSShKey);
           mastodon.get("sshKey").setValue(value.sshKey);
         }
       });
     }
+  }
+
+  $: valid = mastodon ? mastodon$.value.mnemonics.valid : false;
+  $: if (valid) {
+    getGrid(mastodon$.value.mnemonics.value)
+      .then((grid) => grid.twins.get_my_twin_id())
+      .then((t) => (twinId = t));
   }
 </script>
 
@@ -36,28 +45,25 @@
       placeholder="Mnemonics"
       type="password"
       controller={mastodon.get("mnemonics")}
+      loading={mastodon$.value.mnemonics.pending}
+      disabled={mastodon$.value.mnemonics.pending}
+      validation={!mastodon$.value.mnemonics.pending}
+      hint={mastodon$.value.mnemonics.pending
+        ? "Validating mnemonics..."
+        : undefined}
     />
 
-    <div class="is-flex">
-      <div style:width="100%">
-        <Input
-          label="Public SSH Key"
-          type="textarea"
-          placeholder="Your public SSH Key"
-          controller={mastodon.get("sshKey")}
-          disabled={!mastodon$.value.enableSShKey.value}
-          validation={mastodon$.value.enableSShKey.value}
-        />
-      </div>
+    <Input
+      label="Public SSH Key"
+      type="textarea"
+      placeholder="Your public SSH Key"
+      controller={mastodon.get("sshKey")}
+    />
 
-      <div class="mt-6 ml-2">
-        <b-tooltip
-          tooltip="On disable the deployed solutions'll be inaccessible."
-          flow="left"
-        >
-          <CheckBox controller={mastodon.get("enableSShKey")} />
-        </b-tooltip>
-      </div>
-    </div>
+    {#if valid && twinId}
+      <Qrcode
+        data="TFT:GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG?message=twin_{twinId}&sender=me&amount=100"
+      />
+    {/if}
   </section>
 {/if}
