@@ -28,4 +28,10 @@ export default defineConfig({
       ],
     },
   },
+
+  // resolve: {
+  //   alias: {
+  //     fs: "rollup-plugin-node-polyfills/polyfills/fs",
+  //   },
+  // },
 });

@@ -16,6 +16,7 @@
     "@tsconfig/svelte": "^3.0.0",
     "@types/lodash": "^4.14.189",
     "@types/qrcode": "^1.5.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "svelte": "^3.52.0",
     "svelte-check": "^2.9.2",
     "svelte-preprocess": "^4.10.7",
@@ -30,6 +31,7 @@
     "tf-svelte-bulma-wc": "^1.0.0",
     "tf-svelte-rx-forms": "^1.0.0",
     "tfgrid-gql": "^1.0.0",
-    "ts-rmb-http-client": "^1.0.7"
+    "ts-rmb-http-client": "^1.0.7",
+    "web-ssh-keygen": "^0.1.2"
   }
 }

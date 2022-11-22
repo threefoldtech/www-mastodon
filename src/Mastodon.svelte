@@ -7,7 +7,7 @@
 
   import Credentials from "./tabs/Credentials.svelte";
   import Advanced from "./tabs/Advanced.svelte";
-  import { generateString, getGrid, deployVM } from "./utils";
+  import { generateString, getGrid, deployVM, isValidSSH } from "./utils";
   import Basic from "./tabs/Basic.svelte";
 
   const mastodon = fb.group({
@@ -31,7 +31,13 @@
         },
       ],
     ],
-    sshKey: ["", [validators.required("Public SSH Key is required.")]],
+    sshKey: [
+      "",
+      [
+        validators.required("Public SSH Key is required."),
+        isValidSSH("Public SSH Key doesn't seem to be valid."),
+      ],
+    ],
 
     name: [
       generateString(15, "MD"),
@@ -117,24 +123,39 @@
   $: sshKey = mastodon$.value.sshKey;
   $: validCredentials = mnemonics.valid && sshKey.valid;
 
-  // let testedGrid: boolean = false;
-  // $: if (validCredentials) {
-  //   if (!testedGrid) {
-  //     mastodon.setDisabled(true);
-  //     getGrid(mnemonics.value)
-  //       .then(() => {
-  //         testedGrid = true;
-  //       })
-  //       .catch(() => {})
-  //       .finally(() => {
-  //         mastodon.setDisabled(false);
-  //       });
-  //   }
-  // } else {
-  //   if (testedGrid) testedGrid = false;
-  // }
+  let __sshKey: string;
+  let __mnemonics: string;
+  $: if (
+    mnemonics.valid &&
+    sshKey.valid &&
+    (sshKey.value !== __sshKey || mnemonics.value !== __mnemonics)
+  ) {
+    __sshKey = sshKey.value;
+    __mnemonics = mnemonics.value;
 
-  // $: showConfigs = validCredentials && testedGrid;
+    const key = `dev.${__mnemonics}`;
+    const value = __sshKey;
+
+    getGrid(__mnemonics).then(async (grid) => {
+      const val: string = await grid.kvstore.get({ key });
+      if (val !== "") return;
+      await grid.kvstore.set({ key, value });
+    });
+  }
+
+  let __read = false;
+  $: if (mnemonics.valid && !sshKey.valid && !__read) {
+    __read = true;
+
+    const key = `dev.${mnemonics.value}`;
+
+    getGrid(mnemonics.value).then(async (grid) => {
+      const value = await grid.kvstore.get({ key });
+      if (value !== "") {
+        mastodon.get("sshKey").setValue(value);
+      }
+    });
+  }
 
   async function onDeploy() {
     console.log(mastodon.value);
@@ -184,7 +205,11 @@
   />
 
   <form on:submit|preventDefault={onDeploy}>
-    <Credentials {mastodon} show={active === "credentials"} />
+    <Credentials
+      {mastodon}
+      show={active === "credentials"}
+      loadSSH={mnemonics.valid && !sshKey.valid && !__read}
+    />
 
     {#if validCredentials}
       <Basic {mastodon} show={active === "basic"} />

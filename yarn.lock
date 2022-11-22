@@ -1351,6 +1351,11 @@ vitefu@^0.2.1:
   resolved "https://registry.yarnpkg.com/vitefu/-/vitefu-0.2.1.tgz#9dcd78737c77b366206706dac2403a751903907d"
   integrity sha512-clkvXTAeUf+XQKm3bhWUhT4pye+3acm6YCTGaWhxxIvZZ/QjnA3JA8Zud+z/mO5y5XYvJJhevs5Sjkv/FI8nRw==
 
+web-ssh-keygen@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/web-ssh-keygen/-/web-ssh-keygen-0.1.2.tgz#d01ba786874632035b58eb2661e22ed9fe2432e3"
+  integrity sha512-NbhsaT0c9xD0dASNN7ox1SvjH7DXUdIZRU/RFinlM/w4Yinkn3yzBr8tDkoMzVOV/VuwVfEKooH88Rn83VaoUg==
+
 which-module@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/which-module/-/which-module-2.0.0.tgz#d9ef07dce77b9902b8a3a8fa4b31c3e3f7e6e87a"
