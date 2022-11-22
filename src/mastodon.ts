@@ -1,9 +1,16 @@
 // without any split
 // import "grid3_client";
 // import "./Mastodon.svelte";
+import "./components/AppLoader.svelte";
+
+const appLoader: any = document.createElement("tf-app-loader");
+appLoader.total = 9;
+document.body.append(appLoader);
 
 function download(name: string) {
-  console.log(`Downloading ${name}...`);
+  const msg = `Downloading ${name}...`;
+  console.log(msg);
+  appLoader.setMessage(msg);
 }
 
 export async function main() {
@@ -33,6 +40,8 @@ export async function main() {
 
   download("Mastodon Weblet");
   await import("./Mastodon.svelte");
+
+  appLoader.remove();
 }
 
 main();
