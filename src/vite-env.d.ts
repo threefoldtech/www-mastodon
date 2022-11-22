@@ -12,13 +12,13 @@ import type qrcode from "qrcode";
 
 declare global {
   interface Window {
-    bip39: bip39;
-    grid3_client: GridClient;
-    tfSvelteBulmaWc: tfSvelteBulmaWc;
-    tfSvelteRxForms: tfSvelteRxForms;
-    tsRmbHttpClient: tsRmbHttpClient;
-    webSshKeygen: webSshKeygen;
-    tfgridGql: tfgridGql;
-    qrcode: qrcode;
+    grid3_client: typeof grid3_client;
+    bip39: typeof bip39;
+    tfSvelteBulmaWc: typeof tfSvelteBulmaWc;
+    tfSvelteRxForms: typeof tfSvelteRxForms;
+    tsRmbHttpClient: typeof tsRmbHttpClient;
+    webSshKeygen: typeof webSshKeygen;
+    tfgridGql: typeof tfgridGql;
+    qrcode: typeof qrcode;
   }
 }
