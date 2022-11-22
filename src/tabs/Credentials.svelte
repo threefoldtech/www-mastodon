@@ -2,11 +2,11 @@
 
 <script lang="ts">
   import type { MastodonForm } from "../Mastodon.svelte";
-  import { Input, btn } from "tf-svelte-bulma-wc";
+  const { Input, btn } = window.tfSvelteBulmaWc;
   import { getGrid, Session } from "../utils";
   import Qrcode from "../components/Qrcode.svelte";
-  import { HTTPMessageBusClient } from "ts-rmb-http-client";
-  import { generateKeyPair } from "web-ssh-keygen";
+  const { HTTPMessageBusClient } = window.tsRmbHttpClient;
+  const { generateKeyPair } = window.webSshKeygen;
 
   export let show: boolean;
   export let mastodon: MastodonForm;

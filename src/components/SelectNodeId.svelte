@@ -3,28 +3,23 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import type { MastodonForm } from "../Mastodon.svelte";
-  import { findNodes, getGrid } from "../utils";
-  import { Select } from "tf-svelte-bulma-wc";
-  import { fb, FormControl, FormGroup, validators } from "tf-svelte-rx-forms";
+  import { findNodes } from "../utils";
+  const { Select } = window.tfSvelteBulmaWc;
+  const { fb, FormGroup, validators } = window.tfSvelteRxForms;
   import debounce from "lodash/debounce.js";
   import type { Unsubscriber } from "tf-svelte-rx-forms/dist/internals/rx_store";
-  import type {
-    FarmInfo,
-    FilterOptions,
-    GridClient,
-    NodeInfo,
-  } from "grid3_client/dist/node";
-  import TFGridGqlClient, { Networks } from "tfgrid-gql";
+  import type { NodeInfo } from "grid3_client/dist/node";
+  import { regions } from "../regions";
+  const { default: TFGridGqlClient, Networks } = window.tfgridGql;
+  import type { FormControl, FormGroup } from "tf-svelte-rx-forms";
 
   export let mastodon: MastodonForm;
   const controller = fb.control<number>(null, [
     validators.required("Node ID is required."),
   ]);
-  const farmName = fb.control<string>(null);
-  const region = fb.control<string>(null);
+  const farmId = fb.control<number>(null);
   let nodes: NodeInfo[] = [];
-  let farms: FarmInfo[] = [];
-  let regions: string[] = [];
+  let farms: { name: string; farmID: number }[] = [];
 
   const loadNodes = debounce(
     async (
@@ -33,6 +28,9 @@
         mru: FormControl<number>;
         sru: FormControl<number>;
         publicIPs: FormControl<boolean>;
+        region: FormControl<string>;
+        certified: FormControl<boolean>;
+        farmId: FormControl<number>;
       }>
     ) => {
       nodes = [];
@@ -41,9 +39,23 @@
       const nodeId = controller.value;
       controller.setValue(null);
 
-      const filters: FilterOptions = form.value;
+      const filters = form.value;
+      delete filters.region;
       filters.mru /= 1024;
+
       nodes = await findNodes(mastodon.value.mnemonics, filters);
+
+      if (form.get("certified").value) {
+        nodes = nodes.filter((node) => node.certificationType === "Certified");
+      }
+
+      const region = form.get("region").value;
+      if (region !== null) {
+        const allowedCountried = regions[region];
+        nodes = nodes.filter((node) =>
+          allowedCountried.includes(node.location.country)
+        );
+      }
 
       if (nodes.some((n) => n.nodeId === nodeId)) {
         controller.setValue(nodeId);
@@ -57,40 +69,52 @@
     1500
   );
 
-  //   async function loadRegions(grid: GridClient) {
-  //     const gql = new TFGridGqlClient(grid.network as unknown as Networks);
-  //     const countries = await gql.countries({ subregion: true });
-  //     regions = Array.from(new Set(countries.map((c) => c.subregion)));
-  //     regionLoaded = true;
-  //   }
+  async function loadFarms() {
+    const gql = new TFGridGqlClient(Networks.Dev);
 
-  async function loadFarms(grid: GridClient) {
-    farms = await grid.capacity.getAllFarms();
+    const where = { updatedAt_gt: Date.now() - 1 * 60 * 60 * 1000 };
+    const orderBy: ["nodeID_ASC"] = ["nodeID_ASC"];
+
+    farms = await gql
+      .nodesConnection({ totalCount: true }, { where, orderBy })
+      .then(({ totalCount: limit }) => {
+        return gql.nodes({ farmID: true }, { where, orderBy, limit });
+      })
+      .then((nodes) => {
+        return gql.farms(
+          { name: true, farmID: true },
+          {
+            where: {
+              farmID_in: Array.from(new Set(nodes.map((n) => n.farmID))),
+            },
+            orderBy: ["farmID_ASC"],
+          }
+        );
+      });
+
     farmLoaded = true;
     loadNodes(f);
   }
 
   let loading: boolean = false;
   let farmLoaded: boolean = false;
-  let regionLoaded: boolean = true;
   let unsubscribe: Unsubscriber;
   let f: any;
   onDestroy(() => unsubscribe?.());
   onMount(async () => {
-    const grid = await getGrid(mastodon.value.mnemonics);
-    // loadRegions(grid);
-    loadFarms(grid);
-  });
-  onMount(() => {
+    await loadFarms();
+
     f = new FormGroup({
       cru: mastodon.get("cpu"),
       mru: mastodon.get("memory"),
       sru: mastodon.get("disk"),
       publicIPs: mastodon.get("ipv4"),
-      farmName,
+      region: mastodon.get("region"),
+      certified: mastodon.get("certified"),
+      farmId,
     });
     unsubscribe = f.subscribe(() => {
-      if (farmLoaded && regionLoaded) {
+      if (farmLoaded) {
         loading = true;
         mastodon.get("nodeId").setValue(null);
         loadNodes(f);
@@ -106,27 +130,19 @@
 
 {#if mastodon}
   <Select
-    label="Select a farm"
+    label="Select farm id"
     options={[
-      { label: "Select a farm", value: null },
-      ...farms.map((f) => ({ label: f.name, value: f.name })),
+      { label: "All", value: null },
+      ...farms.map((f) => ({
+        label: `${f.name}(${f.farmID})`,
+        value: f.farmID,
+      })),
     ]}
-    controller={farmName}
+    controller={farmId}
     validation={false}
     loading={!farmLoaded}
     disabled={!farmLoaded}
   />
-
-  <!-- <Select
-    label="Select a region"
-    options={[{ label: "Select a region", value: null }].concat(
-      regions.map((r) => ({ label: r, value: r }))
-    )}
-    controller={region}
-    validation={false}
-    loading={!regionLoaded}
-    disabled={!regionLoaded}
-  /> -->
 
   <Select
     label="Select Node ID"

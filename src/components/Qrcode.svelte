@@ -1,7 +1,7 @@
 <svelte:options tag="tf-qrcode" />
 
 <script lang="ts">
-  import qrcode from "qrcode";
+  const qrcode = window.qrcode;
 
   export let data: string = "hello world";
   let loading = false;

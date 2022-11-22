@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Select } from "tf-svelte-bulma-wc";
+  const { Select } = window.tfSvelteBulmaWc;
   import type { MastodonForm } from "../Mastodon.svelte";
   import { getGateways } from "../utils";
 

@@ -1,13 +1,19 @@
 <svelte:options tag="tf-mastodon" />
 
 <script context="module" lang="ts">
-  import { Tabs, btn } from "tf-svelte-bulma-wc";
-  import { fb, validators } from "tf-svelte-rx-forms";
-  import { validateMnemonic } from "bip39";
+  const { Tabs, btn } = window.tfSvelteBulmaWc;
+  const { fb, validators } = window.tfSvelteRxForms;
+  const { validateMnemonic } = window.bip39;
 
   import Credentials from "./tabs/Credentials.svelte";
   import Advanced from "./tabs/Advanced.svelte";
-  import { generateString, getGrid, deployVM, isValidSSH } from "./utils";
+  import {
+    generateString,
+    getGrid,
+    deployVM,
+    isValidSSH,
+    checkNode,
+  } from "./utils";
   import Basic from "./tabs/Basic.svelte";
 
   const mastodon = fb.group({
@@ -111,6 +117,34 @@
         ],
       ],
     }),
+
+    smtp: fb.group({
+      enable: [false],
+      email: [
+        "",
+        [
+          validators.isEmail("Invalid email format.", {
+            require_tld: true,
+          }),
+        ],
+      ],
+      password: [
+        generateString(15),
+        [
+          validators.minLength("SMTP password must be at least 6 chars.", 6),
+          validators.maxLength("SMTP Password can't pass 15 chars.", 15),
+        ],
+      ],
+      server: [
+        "",
+        [validators.isURL("Invalid SMTP server.", { require_tld: true })],
+      ],
+      port: [null as number, [validators.isPort("Invalid SMTP port.")]],
+    }),
+
+    region: [null as string],
+
+    certified: [false],
   });
 
   export type MastodonForm = typeof mastodon;
@@ -159,6 +193,8 @@
 
   async function onDeploy() {
     console.log(mastodon.value);
+
+    console.log({ checkNode: await checkNode(mastodon.value.nodeId) });
 
     // const { value } = mastodon;
     // deployVM({

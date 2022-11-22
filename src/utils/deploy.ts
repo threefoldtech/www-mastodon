@@ -90,3 +90,10 @@ export async function deployVM(options: VMOptions) {
   const grid = await getGrid(options.mnemonics);
   return grid.machines.deploy(vms);
 }
+
+export function checkNode(nodeId: number): Promise<boolean> {
+  return fetch(`https://gridproxy.dev.grid.tf/nodes/${nodeId}`)
+    .then<{ status: "up" }>((res) => res.json())
+    .then(({ status }) => status === "up")
+    .catch(() => false);
+}

@@ -1272,6 +1272,14 @@ tf-svelte-rx-forms@^1.0.0:
     "@types/validator" "^13.7.7"
     validator "^13.7.0"
 
+tf-svelte-rx-forms@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/tf-svelte-rx-forms/-/tf-svelte-rx-forms-1.0.2.tgz#a1352ffdc2d910c198edaf3e75fddee2868135b2"
+  integrity sha512-kq2jfws89lv9OWOvL45lNcaCBegyJCUXRK3I2cr6Vgr5jxL+Im3Z7BAVU4FqfnrJYZ0i4OGEWqaIJ4mcSoDcZA==
+  dependencies:
+    "@types/validator" "^13.7.7"
+    validator "^13.7.0"
+
 tfgrid-gql@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/tfgrid-gql/-/tfgrid-gql-1.0.0.tgz#b5e8cff55be43a1b5ebee8e22e2bd5898ae75a2b"

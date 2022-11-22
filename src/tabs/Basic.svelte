@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import type { MastodonForm } from "../Mastodon.svelte";
-  import { Input } from "tf-svelte-bulma-wc";
+  const { Input, Select, CheckBox } = window.tfSvelteBulmaWc;
 
   export let show: boolean;
   export let mastodon: MastodonForm;
@@ -21,5 +21,25 @@
       placeholder="Admin Email"
       controller={mastodon.get("admin").get("email")}
     />
+
+    <Select
+      label="Region"
+      controller={mastodon.get("region")}
+      options={[
+        { label: "All", value: null },
+        ...[
+          "Asia",
+          "Europe",
+          "Africa",
+          "Oceania",
+          "Americas",
+          "Polar",
+          "Antarctic Ocean",
+          "Antarctic",
+        ].map((r) => ({ label: r, value: r })),
+      ]}
+    />
+
+    <CheckBox label="Certified" controller={mastodon.get("certified")} />
   </section>
 {/if}
