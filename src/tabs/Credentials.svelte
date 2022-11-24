@@ -154,7 +154,7 @@
         on:click={onGenerateSSH}
         disabled={!valid || !twinId || mastodon$.value.sshKey.valid || loadSSH}
       >
-        Generate Public SSH Key
+        Generate SSH Key
       </button>
     </div>
   </section>
