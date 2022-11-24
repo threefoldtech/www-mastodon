@@ -245,14 +245,13 @@
           { key: "SUPERUSER_EMAIL", value: value.admin.email },
           { key: "SUPERUSER_PASSWORD", value: value.admin.password },
           { key: "SSH_KEY", value: value.sshKey },
-
+          { key: "IS_TF_CONNECT", value: `${value.tfConnect}` },
           ...(value.smtp.enable
             ? [
                 { key: "SMTP_SERVER", value: value.smtp.server },
                 { key: "SMTP_LOGIN", value: value.smtp.email },
                 { key: "SMTP_PASSWORD", value: value.smtp.password },
                 { key: "SMTP_PORT", value: value.smtp.port.toString() },
-                { key: "IS_TF_CONNECT", value: `${value.tfConnect}` },
               ]
             : []),
         ],
