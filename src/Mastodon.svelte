@@ -286,13 +286,7 @@
       networking services. It has microblogging features similar to the Twitter
       service, which are offered by a large number of independently run nodes,
       known as instances, each with its own code of conduct, terms of service,
-      privacy options, and moderation policies. <a
-        href="https://library.threefold.me/info/manual/#/manual__weblets_mastodon"
-        target="_blank"
-        rel="noreferrer"
-      >
-        Quick start documentation
-      </a>
+      privacy options, and moderation policies.
     </p>
     <PriceCalculator {mastodon} />
     <hr />
