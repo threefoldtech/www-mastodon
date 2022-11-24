@@ -4,6 +4,7 @@
   const { Tabs, btn } = window.tfSvelteBulmaWc;
   const { fb, validators } = window.tfSvelteRxForms;
   const { validateMnemonic } = window.bip39;
+  const { events } = window.grid3_client;
 
   import Credentials from "./tabs/Credentials.svelte";
   import Advanced from "./tabs/Advanced.svelte";
@@ -13,6 +14,8 @@
     deployVM,
     isValidSSH,
     checkNode,
+    getDomainName,
+    deployGateway,
   } from "./utils";
   import Basic from "./tabs/Basic.svelte";
 
@@ -89,7 +92,7 @@
     planetary: [true],
     ipv4: [false],
     ipv6: [true],
-    gateway: [null as number, [validators.required("Gateway is required.")]],
+    gateway: [null as string, [validators.required("Gateway is required.")]],
     nodeId: [null as number, [validators.required("Node ID is required.")]],
 
     admin: fb.group({
@@ -151,6 +154,10 @@
 </script>
 
 <script lang="ts">
+  import MastodonModal from "./components/MastodonModal.svelte";
+
+  export let provider: string;
+
   let active = "credentials";
   $: mastodon$ = $mastodon;
   $: mnemonics = mastodon$.value.mnemonics;
@@ -191,21 +198,83 @@
     });
   }
 
+  let deploying = false;
+  let error = false;
+  let success = false;
+  let message = "";
+  let deployedData: any;
   async function onDeploy() {
-    console.log(mastodon.value);
+    deploying = true;
+    error = false;
+    success = false;
+    const { value } = mastodon;
+    const log = console.log.bind(console);
 
-    console.log({ checkNode: await checkNode(mastodon.value.nodeId) });
+    try {
+      console.log = (msg: any) =>
+        (message = typeof msg === "object" ? JSON.stringify(msg) : msg);
+      events.addListener("logs", (msg: any) => (message = msg));
 
-    // const { value } = mastodon;
-    // deployVM({
-    //   ...mastodon.value,
-    //   image: {
-    //     entryPoint: "/sbin/zinit init",
-    //     flist:
-    //       "https://hub.grid.tf/omda.3bot/mahmoudemmad-mastodon-latest.flist",
-    //   },
-    //   rootFsSize: value.disk,
-    // }).then(console.log);
+      message = `Checking the status of Node(${value.nodeId})`;
+      await checkNode(value.mnemonics, value.nodeId);
+      message = `Node(${value.nodeId}) is online`;
+
+      const domainName = await getDomainName(value.mnemonics, value.name);
+      const [publicNodeId, nodeDomain] = value.gateway.split(":");
+
+      const vm = await deployVM({
+        ...mastodon.value,
+        image: {
+          flist:
+            "https://hub.grid.tf/omda.3bot/mahmoudemmad-mastodon-latest.flist",
+          entryPoint: "/sbin/zinit init",
+        },
+        rootFsSize: 2,
+        disks: [
+          {
+            name: generateString(15, "disk"),
+            mountPoint: "/var/lib/docker",
+            size: value.disk,
+          },
+        ],
+        envs: [
+          { key: "LOCAL_DOMAIN", value: `${domainName}.${nodeDomain}` },
+          { key: "SUPERUSER_USERNAME", value: value.admin.username },
+          { key: "SUPERUSER_EMAIL", value: value.admin.email },
+          { key: "SUPERUSER_PASSWORD", value: value.admin.password },
+          { key: "SSH_KEY", value: value.sshKey },
+
+          ...(value.smtp.enable
+            ? [
+                { key: "SMTP_SERVER", value: value.smtp.server },
+                { key: "SMTP_LOGIN", value: value.smtp.email },
+                { key: "SMTP_PASSWORD", value: value.smtp.password },
+                { key: "SMTP_PORT", value: value.smtp.port.toString() },
+              ]
+            : []),
+        ],
+        solutionProviderID: +provider,
+      });
+
+      log(vm);
+
+      await deployGateway({
+        domainName,
+        mnemonics: value.mnemonics,
+        planetaryIp: vm[0]["planetary"] as string,
+        publicNodeId: +publicNodeId,
+        solutionProviderID: +provider,
+      });
+
+      deployedData = vm;
+      success = true;
+    } catch (e) {
+      message = e.message;
+      error = true;
+    }
+
+    events.removeAllListeners("logs");
+    console.log = log;
   }
 </script>
 
@@ -227,39 +296,70 @@
     </p>
     <hr />
   </b-content>
-  <Tabs
-    bind:active
-    tabs={[
-      { id: "credentials", label: "Credentials" },
-      ...(validCredentials
-        ? [
-            { id: "basic", label: "Basic" },
-            { id: "advanced", label: "Advanced" },
-          ]
-        : []),
-    ]}
-  />
+  <section class:d-none={deploying}>
+    <Tabs
+      bind:active
+      tabs={[
+        { id: "credentials", label: "Credentials" },
+        ...(validCredentials
+          ? [
+              { id: "basic", label: "Basic" },
+              { id: "advanced", label: "Advanced" },
+            ]
+          : []),
+      ]}
+    />
+  </section>
 
   <form on:submit|preventDefault={onDeploy}>
-    <Credentials
-      {mastodon}
-      show={active === "credentials"}
-      loadSSH={mnemonics.valid && !sshKey.valid && !__read}
-    />
+    <section class:d-none={deploying}>
+      <Credentials
+        {mastodon}
+        show={active === "credentials"}
+        loadSSH={mnemonics.valid && !sshKey.valid && !__read}
+      />
 
-    {#if validCredentials}
-      <Basic {mastodon} show={active === "basic"} />
-      <Advanced {mastodon} show={active === "advanced"} />
-    {/if}
+      {#if validCredentials}
+        <Basic {mastodon} show={active === "basic"} />
+        <Advanced {mastodon} show={active === "advanced"} />
+      {/if}
+    </section>
+
+    <section class:d-none={!deploying}>
+      <b-notification
+        color={error ? "danger" : success ? "success" : "info"}
+        light
+      >
+        [+] {message || "Loading.."}.
+      </b-notification>
+    </section>
 
     <b-btns align="right" class:mt-2={true}>
       <button
-        use:btn={{ color: "primary" }}
-        type="submit"
-        disabled={!mastodon$.valid}
+        use:btn={{
+          color: deploying ? "info" : "primary",
+          loading: deploying && !error && !success,
+        }}
+        type={deploying ? "button" : "submit"}
+        disabled={!mastodon$.valid || (deploying && !error && !success)}
+        on:click={deploying
+          ? (e) => {
+              e.preventDefault();
+              deploying = false;
+              success = false;
+              error = false;
+            }
+          : undefined}
       >
-        Deploy
+        {deploying ? "Back" : "Deploy"}
       </button>
     </b-btns>
   </form>
+
+  {#if deployedData}
+    <MastodonModal
+      on:close={() => (deployedData = undefined)}
+      data={deployedData}
+    />
+  {/if}
 </b-box>

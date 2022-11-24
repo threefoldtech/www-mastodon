@@ -1,5 +1,10 @@
-const { MachineModel, DiskModel, MachinesModel, NetworkModel } =
-  window.grid3_client;
+const {
+  MachineModel,
+  DiskModel,
+  MachinesModel,
+  NetworkModel,
+  GatewayNameModel,
+} = window.grid3_client;
 import { getGrid } from "./grid";
 import { generateString } from "./helpers";
 
@@ -40,6 +45,7 @@ export interface VMOptions {
   image: Image;
   envs?: Env[];
   ip?: string;
+  solutionProviderID?: number;
 }
 
 function __createDisks(disks: Disk[] = []) {
@@ -68,6 +74,8 @@ function __createNetwork() {
 }
 
 export async function deployVM(options: VMOptions) {
+  console.log(options);
+
   const vm = new MachineModel();
   vm.name = options.name;
   vm.node_id = options.nodeId;
@@ -81,6 +89,7 @@ export async function deployVM(options: VMOptions) {
   vm.flist = options.image.flist;
   vm.entrypoint = options.image.entryPoint;
   vm.env = __createEnvs(options.envs);
+  vm.solutionProviderID = options.solutionProviderID;
 
   const vms = new MachinesModel();
   vms.name = options.name;
@@ -88,12 +97,43 @@ export async function deployVM(options: VMOptions) {
   vms.machines = [vm];
 
   const grid = await getGrid(options.mnemonics);
-  return grid.machines.deploy(vms);
+  await grid.machines.deploy(vms);
+  return grid.machines.getObj(options.name);
 }
 
-export function checkNode(nodeId: number): Promise<boolean> {
-  return fetch(`https://gridproxy.dev.grid.tf/nodes/${nodeId}`)
-    .then<{ status: "up" }>((res) => res.json())
-    .then(({ status }) => status === "up")
-    .catch(() => false);
+export function checkNode(mnemonic: string, nodeId: number): Promise<boolean> {
+  return getGrid(mnemonic)
+    .then((grid) => grid.zos.pingNode({ nodeId }))
+    .then(() => true)
+    .catch(() => {
+      throw new Error(`Node(${nodeId}) is offline`);
+    });
+}
+
+export interface GatewayOptions {
+  mnemonics: string;
+  domainName: string;
+  publicNodeId: number;
+  planetaryIp: string;
+  solutionProviderID?: number;
+}
+
+export async function getDomainName(mnemonics: string, name: string) {
+  const grid = await getGrid(mnemonics);
+  const twinId = await grid.twins.get_my_twin_id();
+  return `md${twinId}${name.toLocaleLowerCase()}`;
+}
+
+export async function deployGateway(options: GatewayOptions) {
+  console.log(options);
+
+  const gw = new GatewayNameModel();
+  gw.name = options.domainName;
+  gw.node_id = options.publicNodeId;
+  gw.tls_passthrough = false;
+  gw.backends = [`http://[${options.planetaryIp}]:3000`];
+  gw.solutionProviderID = options.solutionProviderID;
+
+  const grid = await getGrid(options.mnemonics);
+  return grid.gateway.deploy_name(gw);
 }
