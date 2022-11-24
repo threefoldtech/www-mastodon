@@ -256,7 +256,6 @@
               ]
             : []),
         ],
-        solutionProviderID: +provider,
       });
 
       log(vm);
@@ -266,7 +265,6 @@
         mnemonics: value.mnemonics,
         planetaryIp: vm[0]["planetary"] as string,
         publicNodeId: +publicNodeId,
-        solutionProviderID: +provider,
       });
 
       deployedData = vm;
