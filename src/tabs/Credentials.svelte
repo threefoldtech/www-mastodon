@@ -125,7 +125,7 @@
 
     {#if valid && twinId}
       <Qrcode
-        data="TFT:GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG?message=twin_{twinId}&sender=me&amount=100"
+        data="TFT:GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC?message=twin_{twinId}&sender=me&amount=100"
       />
     {/if}
 
