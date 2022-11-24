@@ -98,7 +98,7 @@
           ]}
           position={false}
           rows={instances.map((i) => {
-            const { ip } = i.publicIP;
+            const ip = i.publicIP?.ip;
             return [
               i.name,
               ip || "None",
