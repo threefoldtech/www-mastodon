@@ -11,8 +11,8 @@
 {#if mastodon}
   <section style:display={show ? "initial" : "none"}>
     <Input
-      label="Name"
-      placeholder="Mastodon Instance Name"
+      label="Mastodon Instance Name"
+      placeholder="This name will be used as mastodon instance name"
       controller={mastodon.get("name")}
     />
 
@@ -38,6 +38,11 @@
           "Antarctic",
         ].map((r) => ({ label: r, value: r })),
       ]}
+    />
+
+    <CheckBox
+      label="Enable Threefold Connect"
+      controller={mastodon.get("tfConnect")}
     />
 
     <CheckBox label="Certified" controller={mastodon.get("certified")} />

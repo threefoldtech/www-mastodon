@@ -19,14 +19,13 @@
     mastodon$;
 
     if (__init) {
-      Session.write(Session.Keys.Credentials, mastodon.value);
+      Session.write(Session.Keys.Credentials, mastodon.value.mnemonics);
     } else {
       requestAnimationFrame(() => {
         __init = true;
         const value = Session.read(Session.Keys.Credentials);
         if (value) {
-          mastodon.get("mnemonics").setValue(value.mnemonics);
-          mastodon.get("sshKey").setValue(value.sshKey);
+          mastodon.get("mnemonics").setValue(value);
         }
       });
     }
@@ -50,7 +49,7 @@
     const createdAccount = await client.tfchain.createAccount("::1");
     mastodon.get("mnemonics").setValue(createdAccount.mnemonic);
     await mastodon.get("mnemonics").validate();
-    createdMessage = "Please make sure to buy some tfts.";
+    createdMessage = "Please fund your account to be able to store ssh key";
     creatingAccount = false;
   }
 
@@ -68,8 +67,8 @@
     try {
       const grid = await getGrid(mastodon$.value.mnemonics.value);
       await grid.kvstore.set({
-        key: `dev.${mastodon$.value.mnemonics.value}`,
-        value: keys.publicKey,
+        key: "metadata",
+        value: JSON.stringify({ sshkey: keys.publicKey }),
       });
     } catch (e) {
       sshMessage = "Balance is not enough to store your Public SSH key.";
@@ -77,6 +76,16 @@
 
     mastodon.get("sshKey").setValue(keys.publicKey);
     await mastodon.get("sshKey").validate();
+
+    const data = `data:text/raw;charset=utf-8,${encodeURIComponent(
+      keys.privateKey
+    )}`;
+    const a = document.createElement("a");
+    a.download = "id_rsa";
+    a.href = data;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 
     loadSSH = false;
   }
@@ -95,7 +104,7 @@
           validation={!mastodon$.value.mnemonics.pending && !creatingAccount}
           hint={mastodon$.value.mnemonics.pending
             ? "Validating mnemonics..."
-            : createdMessage}
+            : "Please make sure to store your mnemonics somewhere safe to be able to access your deployments"}
         />
       </div>
       <button
@@ -114,6 +123,12 @@
       </button>
     </div>
 
+    {#if valid && twinId}
+      <Qrcode
+        data="TFT:GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG?message=twin_{twinId}&sender=me&amount=100"
+      />
+    {/if}
+
     <div class="is-flex is-jutify-content-center mb-2">
       <div style:width="100%">
         <Input
@@ -121,9 +136,9 @@
           type="textarea"
           placeholder="Your public SSH Key"
           controller={mastodon.get("sshKey")}
-          disabled={loadSSH}
+          disabled={loadSSH || !!createdMessage || creatingAccount || !valid}
           loading={loadSSH}
-          hint={sshMessage}
+          hint={createdMessage || sshMessage}
         />
       </div>
 
@@ -142,11 +157,5 @@
         Generate Public SSH Key
       </button>
     </div>
-
-    {#if valid && twinId}
-      <Qrcode
-        data="TFT:GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG?message=twin_{twinId}&sender=me&amount=100"
-      />
-    {/if}
   </section>
 {/if}

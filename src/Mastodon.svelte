@@ -49,7 +49,7 @@
     ],
 
     name: [
-      generateString(15, "MD"),
+      generateString(5, "md"),
       [
         validators.required("Mastodon instance's name is required."),
         validators.minLength("Name must be at least 2 chars.", 2),
@@ -57,7 +57,7 @@
       ],
     ],
     cpu: [
-      4,
+      2,
       [
         validators.required("Cpu is required."),
         validators.isInt("Cpu must be a valid integer.", {
@@ -91,7 +91,6 @@
     ],
     planetary: [true],
     ipv4: [false],
-    ipv6: [true],
     gateway: [null as string, [validators.required("Gateway is required.")]],
     nodeId: [null as number, [validators.required("Node ID is required.")]],
 
@@ -148,6 +147,8 @@
     region: [null as string],
 
     certified: [false],
+
+    tfConnect: [false],
   });
 
   export type MastodonForm = typeof mastodon;
@@ -155,6 +156,7 @@
 
 <script lang="ts">
   import MastodonModal from "./components/MastodonModal.svelte";
+  import PriceCalculator from "./components/PriceCalculator.svelte";
 
   export let provider: string;
 
@@ -174,8 +176,8 @@
     __sshKey = sshKey.value;
     __mnemonics = mnemonics.value;
 
-    const key = `dev.${__mnemonics}`;
-    const value = __sshKey;
+    const key = "metadata";
+    const value = JSON.stringify({ sshkey: __sshKey });
 
     getGrid(__mnemonics).then(async (grid) => {
       const val: string = await grid.kvstore.get({ key });
@@ -188,12 +190,12 @@
   $: if (mnemonics.valid && !sshKey.valid && !__read) {
     __read = true;
 
-    const key = `dev.${mnemonics.value}`;
+    const key = "metadata";
 
     getGrid(mnemonics.value).then(async (grid) => {
       const value = await grid.kvstore.get({ key });
       if (value !== "") {
-        mastodon.get("sshKey").setValue(value);
+        mastodon.get("sshKey").setValue(JSON.parse(value).sshkey);
       }
     });
   }
@@ -250,6 +252,7 @@
                 { key: "SMTP_LOGIN", value: value.smtp.email },
                 { key: "SMTP_PASSWORD", value: value.smtp.password },
                 { key: "SMTP_PORT", value: value.smtp.port.toString() },
+                { key: "IS_TF_CONNECT", value: `${value.tfConnect}` },
               ]
             : []),
         ],
@@ -294,6 +297,7 @@
         Quick start documentation
       </a>
     </p>
+    <PriceCalculator {mastodon} />
     <hr />
   </b-content>
   <section class:d-none={deploying}>

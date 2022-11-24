@@ -13,7 +13,7 @@
   export let mastodon: MastodonForm;
 
   let unsubscribe: Unsubscriber;
-  onDestroy(unsubscribe);
+  onDestroy(() => unsubscribe?.());
   onMount(function mount() {
     if (!mastodon) requestAnimationFrame(mount);
     let __enable: boolean;
@@ -59,7 +59,6 @@
       controller={mastodon.get("planetary")}
     />
     <CheckBox label="Public IPv4" controller={mastodon.get("ipv4")} />
-    <CheckBox label="Public IPv6" controller={mastodon.get("ipv6")} />
 
     <SelectGateway {mastodon} />
 

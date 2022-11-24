@@ -4,7 +4,7 @@
 import "./components/AppLoader.svelte";
 
 const appLoader: any = document.createElement("tf-app-loader");
-appLoader.total = 9;
+appLoader.total = 10;
 document.body.append(appLoader);
 
 function download(name: string) {
@@ -40,6 +40,9 @@ export async function main() {
 
   download("Mastodon Weblet");
   await import("./Mastodon.svelte");
+
+  download("Mastodon List Weblet");
+  await import("./MastodonList.svelte");
 
   appLoader.remove();
 }

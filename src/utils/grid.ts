@@ -11,7 +11,8 @@ export function getGrid(mnemonic: string) {
     NetworkEnv.dev,
     mnemonic,
     mnemonic,
-    new HTTPMessageBusClient(0, "", "", "")
+    new HTTPMessageBusClient(0, "", "", ""),
+    "mastodon"
   );
   return grid.connect().then(() => grid);
 }

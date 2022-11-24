@@ -21,7 +21,7 @@
 
   // prettier-ignore
   onMount(() => {
-    const v = data[0];
+    const v = Array.isArray(data) ? data[0] : data;
     inputs.push({ label: "Name", controller: fb.control(v.name), cmp: Input });
     inputs.push({ label: "Node ID", controller: fb.control(v.nodeId), cmp: Input });
     inputs.push({ label: "Contract ID", controller: fb.control(v.contractId), cmp: Input });
