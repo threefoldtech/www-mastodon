@@ -25,7 +25,7 @@
     <h4 class="has-text-centered has-text-weight-bold">
       Scan QRcode using <a
         target="_blank"
-        href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US&pli=1"
+        href="https://library.threefold.me/info/threefold#/tokens/threefold__threefold_connect"
         rel="noreferrer"
       >
         Threefold connect
