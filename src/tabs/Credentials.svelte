@@ -44,7 +44,7 @@
     creatingAccount = true;
     const { GridClient, NetworkEnv } = window.grid3_client;
     const rmb = new HTTPMessageBusClient(0, "", "", "");
-    const client = new GridClient(NetworkEnv.dev, "", "test", rmb);
+    const client = new GridClient(NetworkEnv.main, "", "test", rmb);
     client._connect();
     const createdAccount = await client.tfchain.createAccount("::1");
     mastodon.get("mnemonics").setValue(createdAccount.mnemonic);

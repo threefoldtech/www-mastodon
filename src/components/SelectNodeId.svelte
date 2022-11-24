@@ -70,7 +70,7 @@
   );
 
   async function loadFarms() {
-    const gql = new TFGridGqlClient(Networks.Dev);
+    const gql = new TFGridGqlClient(Networks.Main);
 
     const where = { updatedAt_gt: Date.now() - 1 * 60 * 60 * 1000 };
     const orderBy: ["nodeID_ASC"] = ["nodeID_ASC"];

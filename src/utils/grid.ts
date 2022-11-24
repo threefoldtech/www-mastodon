@@ -8,7 +8,7 @@ import type {
 
 export function getGrid(mnemonic: string) {
   const grid = new GridClient(
-    NetworkEnv.dev,
+    NetworkEnv.main,
     mnemonic,
     mnemonic,
     new HTTPMessageBusClient(0, "", "", ""),
