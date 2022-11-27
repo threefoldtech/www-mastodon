@@ -10,8 +10,9 @@
   import type { Unsubscriber } from "tf-svelte-rx-forms/dist/internals/rx_store";
   import type { NodeInfo } from "grid3_client/dist/node";
   import { regions } from "../regions";
-  const { default: TFGridGqlClient, Networks } = window.tfgridGql;
+  const { default: TFGridGqlClient } = window.tfgridGql;
   import type { FormControl, FormGroup } from "tf-svelte-rx-forms";
+  import type { Networks } from "tfgrid-gql";
 
   export let mastodon: MastodonForm;
   const controller = fb.control<number>(null, [
@@ -70,7 +71,7 @@
   );
 
   async function loadFarms() {
-    const gql = new TFGridGqlClient(Networks.Main);
+    const gql = new TFGridGqlClient(window.config.network as Networks);
 
     const where = { updatedAt_gt: Date.now() - 1 * 60 * 60 * 1000 };
     const orderBy: ["nodeID_ASC"] = ["nodeID_ASC"];

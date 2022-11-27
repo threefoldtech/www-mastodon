@@ -5,6 +5,9 @@
   const { Input, btn } = window.tfSvelteBulmaWc;
   import { getGrid, Session } from "../utils";
   import Qrcode from "../components/Qrcode.svelte";
+  import type { NetworkEnv } from "grid3_client";
+  import { onMount } from "svelte";
+  import type { FormControl } from "tf-svelte-rx-forms";
   const { HTTPMessageBusClient } = window.tsRmbHttpClient;
   const { generateKeyPair } = window.webSshKeygen;
 
@@ -44,7 +47,12 @@
     creatingAccount = true;
     const { GridClient, NetworkEnv } = window.grid3_client;
     const rmb = new HTTPMessageBusClient(0, "", "", "");
-    const client = new GridClient(NetworkEnv.main, "", "test", rmb);
+    const client = new GridClient(
+      window.config.network as NetworkEnv,
+      "",
+      "test",
+      rmb
+    );
     client._connect();
     const createdAccount = await client.tfchain.createAccount("::1");
     mastodon.get("mnemonics").setValue(createdAccount.mnemonic);
@@ -89,6 +97,12 @@
 
     loadSSH = false;
   }
+
+  let mnemonics: FormControl<string>;
+  onMount(() => {
+    mnemonics = mastodon.get("mnemonics");
+    console.log({ mastodon, mnemonics });
+  });
 </script>
 
 {#if mastodon}

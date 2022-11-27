@@ -4,7 +4,7 @@
 import "./components/AppLoader.svelte";
 
 const appLoader: any = document.createElement("tf-app-loader");
-appLoader.total = 10;
+appLoader.total = 9;
 document.body.append(appLoader);
 
 function download(name: string) {
@@ -17,14 +17,11 @@ export async function main() {
   download("Grid3 Client");
   await import("grid3_client");
 
-  download("bip39");
-  window.bip39 = await import("bip39");
+  download("Threefold Svelte Bulma Reactive Forms");
+  window.tfSvelteRxForms = await import("tf-svelte-rx-forms");
 
   download("Threefold Svelte Bulma Web Components");
   window.tfSvelteBulmaWc = await import("tf-svelte-bulma-wc");
-
-  download("Threefold Svelte Bulma Reactive Forms");
-  window.tfSvelteRxForms = await import("tf-svelte-rx-forms");
 
   download("Typescript RMB Http Client");
   window.tsRmbHttpClient = await import("ts-rmb-http-client");

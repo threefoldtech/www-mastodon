@@ -3,7 +3,6 @@
 <script context="module" lang="ts">
   const { Tabs, btn } = window.tfSvelteBulmaWc;
   const { fb, validators } = window.tfSvelteRxForms;
-  const { validateMnemonic } = window.bip39;
   const { events } = window.grid3_client;
 
   import Credentials from "./tabs/Credentials.svelte";
@@ -16,20 +15,26 @@
     checkNode,
     getDomainName,
     deployGateway,
+    isMnemonics,
   } from "./utils";
   import Basic from "./tabs/Basic.svelte";
 
+  export type MastodonForm = any;
+</script>
+
+<script lang="ts">
+  import MastodonModal from "./components/MastodonModal.svelte";
+  import PriceCalculator from "./components/PriceCalculator.svelte";
+  import { onMount } from "svelte";
+  import type { FormGroupValue } from "tf-svelte-rx-forms/dist/types";
+  const { Input } = window.tfSvelteBulmaWc;
+  const { form } = window.tfSvelteRxForms;
+
+  export let provider: string;
   const mastodon = fb.group({
     mnemonics: [
       "",
-      [
-        validators.required("Mnemonics is required."),
-        (ctrl) => {
-          if (!validateMnemonic(ctrl.value)) {
-            return { message: "Mnemonic doesn't seem to be valid." };
-          }
-        },
-      ],
+      [validators.required("Mnemonics is required."), isMnemonics],
       [
         async (ctrl) => {
           try {
@@ -151,17 +156,9 @@
     tfConnect: [false],
   });
 
-  export type MastodonForm = typeof mastodon;
-</script>
-
-<script lang="ts">
-  import MastodonModal from "./components/MastodonModal.svelte";
-  import PriceCalculator from "./components/PriceCalculator.svelte";
-
-  export let provider: string;
-
   let active = "credentials";
   $: mastodon$ = $mastodon;
+  $: console.log(mastodon$.value.mnemonics);
   $: mnemonics = mastodon$.value.mnemonics;
   $: sshKey = mastodon$.value.sshKey;
   $: validCredentials = mnemonics.valid && sshKey.valid;
@@ -255,6 +252,7 @@
               ]
             : []),
         ],
+        solutionProviderID: +provider,
       });
 
       log(vm);
@@ -264,6 +262,7 @@
         mnemonics: value.mnemonics,
         planetaryIp: vm[0]["planetary"] as string,
         publicNodeId: +publicNodeId,
+        solutionProviderID: +provider,
       });
 
       deployedData = vm;

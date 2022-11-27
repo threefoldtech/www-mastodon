@@ -1,14 +1,15 @@
-const { GridClient, NetworkEnv, Nodes } = window.grid3_client;
+const { GridClient, Nodes } = window.grid3_client;
 import { HTTPMessageBusClient } from "ts-rmb-http-client";
 import type {
   GridClient as GC,
   FilterOptions,
   NodeInfo,
 } from "grid3_client/dist/node";
+import type { NetworkEnv } from "grid3_client";
 
 export function getGrid(mnemonic: string) {
   const grid = new GridClient(
-    NetworkEnv.main,
+    window.config.network as NetworkEnv,
     mnemonic,
     mnemonic,
     new HTTPMessageBusClient(0, "", "", ""),
