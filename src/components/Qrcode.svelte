@@ -13,6 +13,19 @@
     loading = false;
   }
 
+  const downloads = [
+    {
+      src: "android.svg",
+      alt: "play-store",
+      url: "https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US",
+    },
+    {
+      src: "ios.svg",
+      alt: "app-store",
+      url: "https://apps.apple.com/us/app/threefold-connect/id1459845885",
+    },
+  ];
+
   $: if (data) createQrcode();
 </script>
 
@@ -33,6 +46,18 @@
     </h4>
     <div class="is-flex is-justify-content-center">
       <img {src} alt="qrcode" />
+    </div>
+    <div class="has-text-centered">
+      {#each downloads as { src, alt, url }, index}
+        <img
+          {src}
+          width="300"
+          {alt}
+          class:mr-2={index === 0}
+          style:cursor="pointer"
+          on:mousedown={() => window.open(url, "_blank")}
+        />
+      {/each}
     </div>
   {/if}
 </div>
