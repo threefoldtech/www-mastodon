@@ -207,11 +207,8 @@
     error = false;
     success = false;
     const { value } = mastodon;
-    const log = console.log.bind(console);
 
     try {
-      console.log = (msg: any) =>
-        (message = typeof msg === "object" ? JSON.stringify(msg) : msg);
       events.addListener("logs", (msg: any) => (message = msg));
 
       message = `Checking the status of Node(${value.nodeId})`;
@@ -255,8 +252,6 @@
         solutionProviderID: +provider,
       });
 
-      log(vm);
-
       await deployGateway({
         domainName,
         mnemonics: value.mnemonics,
@@ -273,7 +268,6 @@
     }
 
     events.removeAllListeners("logs");
-    console.log = log;
   }
 </script>
 
