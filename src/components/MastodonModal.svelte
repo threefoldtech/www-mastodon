@@ -16,8 +16,8 @@
     cmp: any;
   }
 
-  let tab = "JSON";
-  const inputs: Detail[] = [];
+  let tab = "Details";
+  let inputs: Detail[] = [];
 
   // prettier-ignore
   onMount(() => {
@@ -27,17 +27,22 @@
     inputs.push({ label: "Contract ID", controller: fb.control(v.contractId), cmp: Input });
     inputs.push({ label: "Flist", controller: fb.control(v.flist), cmp: Input });
 
-    if (v.publicIP.ip) inputs.push({ label: "IPv4", controller: fb.control(v.publicIP.ip), cmp: Input });
-    else inputs.push({ label: "IPv4", controller: fb.control(false), cmp: CheckBox });
+    if (v.publicIP) {
+      if (v.publicIP.ip) inputs.push({ label: "IPv4", controller: fb.control(v.publicIP.ip), cmp: Input });
+      else inputs.push({ label: "IPv4", controller: fb.control(false), cmp: CheckBox });
+  
+      inputs.push({ label: "IPv6", controller: fb.control(v.publicIP.ip6), cmp: Input });
+      inputs.push({ label: "Planetary", controller: fb.control(v.planetary), cmp: Input });
+    }
 
-    inputs.push({ label: "IPv6", controller: fb.control(v.publicIP.ip6), cmp: Input });
-    inputs.push({ label: "Planetary", controller: fb.control(v.planetary), cmp: Input });
     inputs.push({ label: "CPU(vCores)", controller: fb.control(v.capacity.cpu), cmp: Input });
     inputs.push({ label: "Memory(MB)", controller: fb.control(v.capacity.memory), cmp: Input });
     inputs.push({ label: "Domain", controller: fb.control(`https://${v.env.LOCAL_DOMAIN}`), cmp: Input });
     inputs.push({ label: "Super Username", controller: fb.control(v.env.SUPERUSER_USERNAME), cmp: Input });
     inputs.push({ label: "Super Email", controller: fb.control(v.env.SUPERUSER_EMAIL), cmp: Input });
     inputs.push({ label: "Super Password", controller: fb.control(v.env.SUPERUSER_PASSWORD), cmp: Input });
+
+    inputs = [...inputs];
   });
   onDestroy(() => {
     inputs.forEach((i) => i.controller.destroy());
@@ -65,7 +70,7 @@
   <b-modal open>
     <b-modal-header>
       <b-btns align="centered" addons>
-        {#each ["JSON", "Details"] as t}
+        {#each ["Details", "JSON"] as t}
           <button
             type="button"
             use:btn={{ color: tab === t ? "primary" : undefined }}

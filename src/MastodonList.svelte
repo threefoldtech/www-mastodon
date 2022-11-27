@@ -2,22 +2,14 @@
 
 <script lang="ts">
   import MastodonModal from "./components/MastodonModal.svelte";
-  import { getGrid } from "./utils";
+  import { getGrid, isMnemonics } from "./utils";
   const { fb, validators } = window.tfSvelteRxForms;
-  const { validateMnemonic } = window.bip39;
   const { Input, btn, Table } = window.tfSvelteBulmaWc;
 
   let listing = false;
   const mnemonics = fb.control(
     "",
-    [
-      validators.required("Mnemonics is required."),
-      (ctrl) => {
-        if (!validateMnemonic(ctrl.value)) {
-          return { message: "Mnemonic doesn't seem to be valid." };
-        }
-      },
-    ],
+    [validators.required("Mnemonics is required."), isMnemonics],
     [
       async (ctrl) => {
         try {
