@@ -2,34 +2,17 @@
 
 <script lang="ts">
   import MastodonModal from "./components/MastodonModal.svelte";
-  import { getGrid, isMnemonics } from "./utils";
-  const { fb, validators } = window.tfSvelteRxForms;
-  const { Input, btn, Table } = window.tfSvelteBulmaWc;
+  import { getGrid, mastodon } from "./utils";
+  const { Table } = window.tfSvelteBulmaWc;
 
-  let listing = false;
-  const mnemonics = fb.control(
-    "",
-    [validators.required("Mnemonics is required."), isMnemonics],
-    [
-      async (ctrl) => {
-        try {
-          await getGrid(ctrl.value);
-        } catch {
-          return { message: "Couldn't load grid using these mnemonic." };
-        }
-      },
-    ]
-  );
-
+  const mnemonics = mastodon.get("mnemonics");
   $: mnemonics$ = $mnemonics;
 
+  let loading = false;
   let deployedData: any;
   let instances: any[] = [];
-  let loading = false;
-  let __init = false;
-  $: if (listing && !__init) listMastodon();
+
   async function listMastodon() {
-    __init = true;
     loading = true;
     const grid = await getGrid(mnemonics$.value);
     const names = await grid.machines.list();
@@ -41,6 +24,12 @@
     instances = _instances;
     loading = false;
   }
+
+  let __mnemonicsValid: boolean = false;
+  $: if (mnemonics$.valid !== __mnemonicsValid) {
+    __mnemonicsValid = mnemonics$.valid;
+    if (mnemonics$.valid) listMastodon();
+  }
 </script>
 
 <b-box>
@@ -49,33 +38,18 @@
     <hr />
   </b-content>
 
-  {#if !listing}
-    <form on:submit={() => (listing = true)}>
-      <Input
-        label="Mnemonics"
-        type="password"
-        controller={mnemonics}
-        disabled={mnemonics$.pending}
-        validation={!mnemonics$.pending}
-        hint={mnemonics$.pending ? "Validating mnemonics..." : undefined}
-      />
-
-      <button
-        type="submit"
-        use:btn={{
-          color: "info",
-          loading: mnemonics$.pending,
-          fullwidth: true,
-        }}
-        disabled={!mnemonics$.valid}
-      >
-        List
-      </button>
-    </form>
+  {#if !mnemonics$.valid}
+    <b-notification color="info" light>
+      Please insert your mnemonics.
+    </b-notification>
   {:else}
     {#if loading}
       <b-notification color="primary" light>
         Listing Deployments ...
+      </b-notification>
+    {:else if instances.length === 0}
+      <b-notification color="info" light>
+        No deployments were found.
       </b-notification>
     {:else}
       <div style:width="100%" style:overflow-x="auto">
