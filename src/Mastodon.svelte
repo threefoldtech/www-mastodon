@@ -144,6 +144,7 @@
 
       deployedData = vm;
       success = true;
+      message = "Successfully deployed Mastodon instance.";
     } catch (e) {
       message = e.message;
       error = true;
