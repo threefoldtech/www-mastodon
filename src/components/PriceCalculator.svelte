@@ -48,28 +48,26 @@
 
 <div>
   {#if mastodon}
-    {#each !mastodon$.value.mnemonics.valid ? [price] : [price, price50K] as p, index}
-      <div style:margin-bottom={index === 0 ? -5 : undefined}>
-        <b-tags addons align="centered" size="large">
-          <b-tag>
-            {mastodon$.value.mnemonics.valid && !loading
-              ? "The deployment will cost "
-              : ""}
-            <strong class="mr-1 ml-1">
-              {!mastodon$.value.mnemonics.valid
-                ? "Please insert your mnemonics"
-                : loading
-                ? "Loading..."
-                : p}
-            </strong>
-            {mastodon$.value.mnemonics.valid
-              ? `USD/Month ${
-                  index === 1 ? "for 50K Balance after applying discount" : ""
-                }`
-              : ""}
-          </b-tag>
-        </b-tags>
-      </div>
-    {/each}
+    {#if mastodon$.value.mnemonics.valid}
+      {#each [price, price50K] as p, index}
+        <div style:margin-bottom={index === 0 ? -5 : undefined}>
+          <b-tags addons align="centered" size="large">
+            <b-tag>
+              {mastodon$.value.mnemonics.valid && !loading
+                ? "The deployment will cost "
+                : ""}
+              <strong class="mr-1 ml-1">
+                {loading ? "Loading..." : p}
+              </strong>
+              {mastodon$.value.mnemonics.valid
+                ? `USD/Month ${
+                    index === 1 ? "for 50K Balance after applying discount" : ""
+                  }`
+                : ""}
+            </b-tag>
+          </b-tags>
+        </div>
+      {/each}
+    {/if}
   {/if}
 </div>
