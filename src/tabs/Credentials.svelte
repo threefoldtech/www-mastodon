@@ -13,11 +13,9 @@
 
   export let show: boolean;
   export let mastodon: MastodonForm;
-  export let loadSSH: boolean;
-  let twinId: number;
+  // export let loadSSH: boolean;
 
   let __init = false;
-  $: mastodon$ = $mastodon;
   $: if (mastodon) {
     mastodon$;
 
@@ -35,35 +33,87 @@
   }
 
   $: valid = mastodon ? mastodon$.value.mnemonics.valid : false;
+  let twinId: number;
   $: if (valid) {
     getGrid(mastodon$.value.mnemonics.value)
       .then((grid) => grid.twins.get_my_twin_id())
       .then((t) => (twinId = t));
   }
 
-  let creatingAccount = false;
-  let createdMessage: string;
+  let accountCreationStatus: "None" | "Creating" | "Error" | "Done" = "None";
+  let creationMsg: string;
   async function onCreateAccount() {
-    creatingAccount = true;
-    const { GridClient, NetworkEnv } = window.grid3_client;
-    const rmb = new HTTPMessageBusClient(0, "", "", "");
-    const client = new GridClient(
-      window.config.network as NetworkEnv,
-      "",
-      "test",
-      rmb
-    );
-    client._connect();
-    const createdAccount = await client.tfchain.createAccount("::1");
-    mastodon.get("mnemonics").setValue(createdAccount.mnemonic);
-    await mastodon.get("mnemonics").validate();
-    createdMessage = "Please fund your account to be able to store ssh key";
-    creatingAccount = false;
+    try {
+      accountCreationStatus = "Creating";
+      const { GridClient } = window.grid3_client;
+      const rmb = new HTTPMessageBusClient(0, "", "", "");
+      const client = new GridClient(
+        window.config.network as NetworkEnv,
+        "",
+        "test",
+        rmb
+      );
+      client._connect();
+      const createdAccount = await client.tfchain.createAccount("::1");
+      mastodon.get("mnemonics").setValue(createdAccount.mnemonic);
+      await mastodon.get("mnemonics").validate();
+      creationMsg =
+        "Please make sure to store your mnemonics somewhere safe to be able to access your deployments";
+      accountCreationStatus = "Done";
+    } catch (e) {
+      accountCreationStatus = "Error";
+      creationMsg = e;
+    }
+  }
+
+  let sshInfoMessage: string;
+  let readingSSH = false;
+  let __ssh: string;
+  let __1 = false;
+  $: if (mnemonics$?.valid && !sshKey$?.valid && !readingSSH && !__1) {
+    __1 = true;
+    readingSSH = true;
+    sshInfoMessage = "Reading Your SSH Key...";
+    const key = "metadata";
+    getGrid(mnemonics$.value)
+      .then(async (grid) => {
+        const value = await grid.kvstore.get({ key });
+        if (value !== "") {
+          requestAnimationFrame(() => {
+            __ssh = JSON.parse(value).sshkey;
+            mastodon.get("sshKey").setValue(__ssh);
+          });
+        }
+      })
+      .finally(() => (readingSSH = false));
+  }
+
+  let storingSSH = false;
+  $: if (
+    mnemonics$?.valid &&
+    sshKey$?.valid &&
+    sshKey$?.value !== __ssh &&
+    !storingSSH
+  ) {
+    __ssh = sshKey$.value;
+    storingSSH = true;
+    sshInfoMessage = "Storing Your SSH Key...";
+
+    getGrid(mnemonics$.value)
+      .then((grid) => {
+        return grid.kvstore.set({
+          key: "metadata",
+          value: JSON.stringify({ sshkey: __ssh }),
+        });
+      })
+      .finally(() => (storingSSH = false));
   }
 
   let sshMessage: string;
+  let generatingSSH = false;
   async function onGenerateSSH() {
-    loadSSH = true;
+    generatingSSH = true;
+    sshInfoMessage = "Generating Your SSH Key...";
 
     const keys = await generateKeyPair({
       alg: "RSASSA-PKCS1-v1_5",
@@ -79,7 +129,7 @@
         value: JSON.stringify({ sshkey: keys.publicKey }),
       });
     } catch (e) {
-      sshMessage = "Balance is not enough to store your Public SSH key.";
+      sshMessage = e.message;
     }
 
     mastodon.get("sshKey").setValue(keys.publicKey);
@@ -95,14 +145,14 @@
     a.click();
     a.remove();
 
-    loadSSH = false;
+    generatingSSH = false;
   }
 
-  let mnemonics: FormControl<string>;
-  onMount(() => {
-    mnemonics = mastodon.get("mnemonics");
-    console.log({ mastodon, mnemonics });
-  });
+  $: mastodon$ = $mastodon;
+  $: mnemonics$ = mastodon$?.value.mnemonics;
+  $: sshKey$ = mastodon$?.value.sshKey;
+  $: pending = mnemonics$?.pending;
+  $: creating = accountCreationStatus === "Creating";
 </script>
 
 {#if mastodon}
@@ -114,11 +164,18 @@
           placeholder="Mnemonics"
           type="password"
           controller={mastodon.get("mnemonics")}
-          disabled={mastodon$.value.mnemonics.pending || creatingAccount}
-          validation={!mastodon$.value.mnemonics.pending && !creatingAccount}
-          hint={mastodon$.value.mnemonics.pending
+          disabled={pending || creating}
+          validation={!(pending || creating)}
+          hint={mnemonics$.pending
             ? "Validating mnemonics..."
-            : "Please make sure to store your mnemonics somewhere safe to be able to access your deployments"}
+            : accountCreationStatus === "Error"
+            ? creationMsg
+            : undefined}
+          hintColor={mnemonics$.pending
+            ? "info"
+            : accountCreationStatus === "Error"
+            ? "danger"
+            : undefined}
         />
       </div>
       <button
@@ -128,16 +185,22 @@
         use:btn={{
           color: "info",
           size: "small",
-          loading: mastodon$.value.mnemonics.pending || creatingAccount,
+          loading: pending || creating,
         }}
         on:click={onCreateAccount}
-        disabled={valid || mastodon$.value.mnemonics.pending || creatingAccount}
+        disabled={mnemonics$.valid || pending || creating}
       >
         Create Account
       </button>
     </div>
+    {#if accountCreationStatus === "Done" && creationMsg}
+      <b-notification color="warning" light class:my-2={true}>
+        <b-icon icon="fa-sharp fa-solid fa-triangle-exclamation" />
+        creationMsg
+      </b-notification>
+    {/if}
 
-    {#if valid && twinId}
+    {#if mnemonics$.valid && twinId}
       <Qrcode
         data="TFT:GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC?message=twin_{twinId}&sender=me&amount=100"
       />
@@ -150,9 +213,16 @@
           type="textarea"
           placeholder="Your public SSH Key"
           controller={mastodon.get("sshKey")}
-          disabled={loadSSH || !!createdMessage || creatingAccount || !valid}
-          loading={loadSSH}
-          hint={createdMessage || sshMessage}
+          loading={readingSSH || generatingSSH || storingSSH}
+          disabled={readingSSH || generatingSSH || storingSSH}
+          hint={sshMessage ||
+            (readingSSH || generatingSSH || storingSSH
+              ? sshInfoMessage
+              : undefined)}
+          validation={!(readingSSH || generatingSSH || storingSSH)}
+          hintColor={readingSSH || generatingSSH || storingSSH
+            ? "info"
+            : undefined}
         />
       </div>
 
@@ -163,10 +233,10 @@
         use:btn={{
           color: "info",
           size: "small",
-          loading: loadSSH,
+          loading: readingSSH || generatingSSH || storingSSH,
         }}
         on:click={onGenerateSSH}
-        disabled={!valid || !twinId || mastodon$.value.sshKey.valid || loadSSH}
+        disabled={readingSSH || generatingSSH || storingSSH || sshKey$.valid}
       >
         Generate SSH Key
       </button>

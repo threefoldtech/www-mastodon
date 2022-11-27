@@ -30,44 +30,9 @@
 
   let active = "credentials";
   $: mastodon$ = $mastodon;
-  $: console.log(mastodon$.value.mnemonics);
   $: mnemonics = mastodon$.value.mnemonics;
   $: sshKey = mastodon$.value.sshKey;
   $: validCredentials = mnemonics.valid && sshKey.valid;
-
-  let __sshKey: string;
-  let __mnemonics: string;
-  $: if (
-    mnemonics.valid &&
-    sshKey.valid &&
-    (sshKey.value !== __sshKey || mnemonics.value !== __mnemonics)
-  ) {
-    __sshKey = sshKey.value;
-    __mnemonics = mnemonics.value;
-
-    const key = "metadata";
-    const value = JSON.stringify({ sshkey: __sshKey });
-
-    getGrid(__mnemonics).then(async (grid) => {
-      const val: string = await grid.kvstore.get({ key });
-      if (val !== "") return;
-      await grid.kvstore.set({ key, value });
-    });
-  }
-
-  let __read = false;
-  $: if (mnemonics.valid && !sshKey.valid && !__read) {
-    __read = true;
-
-    const key = "metadata";
-
-    getGrid(mnemonics.value).then(async (grid) => {
-      const value = await grid.kvstore.get({ key });
-      if (value !== "") {
-        mastodon.get("sshKey").setValue(JSON.parse(value).sshkey);
-      }
-    });
-  }
 
   let deploying = false;
   let error = false;
@@ -184,11 +149,7 @@
 
   <form on:submit|preventDefault={onDeploy}>
     <section class:d-none={deploying}>
-      <Credentials
-        {mastodon}
-        show={active === "credentials"}
-        loadSSH={mnemonics.valid && !sshKey.valid && !__read}
-      />
+      <Credentials {mastodon} show={active === "credentials"} />
 
       {#if validCredentials}
         <Basic {mastodon} show={active === "basic"} />
