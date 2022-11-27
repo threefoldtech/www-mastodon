@@ -46,6 +46,7 @@ export interface VMOptions {
   envs?: Env[];
   ip?: string;
   solutionProviderID?: number;
+  metadata?: string;
 }
 
 function __createDisks(disks: Disk[] = []) {
@@ -74,8 +75,6 @@ function __createNetwork() {
 }
 
 export async function deployVM(options: VMOptions) {
-  console.log(options);
-
   const vm = new MachineModel();
   vm.name = options.name;
   vm.node_id = options.nodeId;
@@ -95,6 +94,7 @@ export async function deployVM(options: VMOptions) {
   vms.name = options.name;
   vms.network = __createNetwork();
   vms.machines = [vm];
+  vms.metadata = options.metadata;
 
   const grid = await getGrid(options.mnemonics);
   await grid.machines.deploy(vms);
@@ -116,6 +116,7 @@ export interface GatewayOptions {
   publicNodeId: number;
   planetaryIp: string;
   solutionProviderID?: number;
+  metadata?: string;
 }
 
 export async function getDomainName(mnemonics: string, name: string) {
@@ -125,14 +126,13 @@ export async function getDomainName(mnemonics: string, name: string) {
 }
 
 export async function deployGateway(options: GatewayOptions) {
-  console.log(options);
-
   const gw = new GatewayNameModel();
   gw.name = options.domainName;
   gw.node_id = options.publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${options.planetaryIp}]:3000`];
   gw.solutionProviderID = options.solutionProviderID;
+  gw.metadata = options.metadata;
 
   const grid = await getGrid(options.mnemonics);
   return grid.gateway.deploy_name(gw);

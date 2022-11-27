@@ -250,6 +250,11 @@
             : []),
         ],
         solutionProviderID: +provider,
+        metadata: JSON.stringify({
+          type: "vm",
+          name: mastodon.value.name,
+          projectName: "Mastodon",
+        }),
       });
 
       await deployGateway({
@@ -258,6 +263,11 @@
         planetaryIp: vm[0]["planetary"] as string,
         publicNodeId: +publicNodeId,
         solutionProviderID: +provider,
+        metadata: JSON.stringify({
+          type: "gateway",
+          name: domainName,
+          projectName: "Mastodon",
+        }),
       });
 
       deployedData = vm;
