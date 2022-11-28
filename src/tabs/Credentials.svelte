@@ -162,6 +162,7 @@
         <Input
           label="Mnemonics"
           placeholder="Mnemonics"
+          sublabel="Mnemonics are your private key, they are used represent you on Threefold Grid. You can paste existing mnemonics or click on the generate button to create a new account."
           type="password"
           controller={mastodon.get("mnemonics")}
           disabled={pending || creating}
@@ -212,6 +213,7 @@
           label="Public SSH Key"
           type="textarea"
           placeholder="Your public SSH Key"
+          sublabel="SSH keys are used to authenticate you to the mastodon instance for management purposes.<br />If you don't have one, or not familiar with it, we can generate one for you."
           controller={mastodon.get("sshKey")}
           loading={readingSSH || generatingSSH || storingSSH}
           disabled={readingSSH || generatingSSH || storingSSH}

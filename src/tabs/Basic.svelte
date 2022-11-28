@@ -12,7 +12,8 @@
   <section style:display={show ? "initial" : "none"}>
     <Input
       label="Mastodon Instance Name"
-      placeholder="This name will be used as mastodon instance name"
+      sublabel="Instance name is used as for managing the deployed instance and to create a subdomain"
+      placeholder="Instance name is used as for managing the deployed instance and to create a subdomain"
       controller={mastodon.get("name")}
     />
 
