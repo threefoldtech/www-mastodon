@@ -182,7 +182,7 @@
       <button
         type="button"
         class:ml-2={true}
-        style:margin-top="30px"
+        style:margin-top="78px"
         use:btn={{
           color: "info",
           size: "small",
@@ -231,7 +231,7 @@
       <button
         type="button"
         class:ml-2={true}
-        style:margin-top="30px"
+        style:margin-top="78px"
         use:btn={{
           color: "info",
           size: "small",
