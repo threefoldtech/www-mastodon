@@ -41,8 +41,9 @@
     inputs.push({ label: "Super Username", controller: fb.control(v.env.SUPERUSER_USERNAME), cmp: Input });
     inputs.push({ label: "Super Email", controller: fb.control(v.env.SUPERUSER_EMAIL), cmp: Input });
     inputs.push({ label: "Super Password", controller: fb.control(v.env.SUPERUSER_PASSWORD), cmp: Input });
-    inputs.push({ label: "Code-Server", controller: fb.control(`http://${v.publicIP?.ip ?? `[${v.planetary}]`}:8001`), cmp: Input, url: true });
-    inputs.push({ label: "Webmin", controller: fb.control(`http://${v.publicIP?.ip ?? `[${v.planetary}]`}:8002`), cmp: Input, url: true });
+    const ip = v.publicIP && v.publicIP.ip ? v.publicIP.ip.replace("/25", "") : `[${v.planetary}]`; 
+    inputs.push({ label: "Code-Server", controller: fb.control(`http://${ip}:8001`), cmp: Input, url: true });
+    inputs.push({ label: "Webmin", controller: fb.control(`http://${ip}:8002`), cmp: Input, url: true });
 
     inputs = [...inputs];
   });

@@ -53,3 +53,22 @@ export function toggleSMTPRequired(
 
   smtp.validate();
 }
+
+export function listenUntillUp(url: string): [Promise<true>, () => void] {
+  let interval: any;
+  return [
+    new Promise<true>((resolve) => {
+      interval = setInterval(() => {
+        fetch(`${url}/api/v1/trends/statuses`)
+          .then((res) => {
+            if (res.status === 200) {
+              resolve(true);
+              clearInterval(interval);
+            }
+          })
+          .catch(() => null);
+      }, 10000);
+    }),
+    () => clearInterval(interval),
+  ];
+}

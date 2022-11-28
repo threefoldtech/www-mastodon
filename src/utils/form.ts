@@ -77,15 +77,27 @@ export const mastodon = fb.group({
       "",
       [
         validators.required("Admin Email is required."),
+        (ctrl) => {
+          if (ctrl.value.toLocaleLowerCase().startsWith("admin@")) {
+            return { message: "The email is reserved, use different email." };
+          }
+        },
         validators.isEmail("Invalid email format.", { require_tld: true }),
       ],
     ],
     username: [
-      "admin",
+      "admin_mastodon",
       [
         validators.required("Admin Username is required."),
         validators.minLength("Username must be at least 2 chars.", 2),
         validators.maxLength("Username can't pass 15 chars.", 15),
+        (ctrl) => {
+          if (ctrl.value.toLocaleLowerCase() === "admin") {
+            return {
+              message: "The username is reserved, use different username.",
+            };
+          }
+        },
       ],
     ],
     password: [

@@ -8,14 +8,12 @@
   import Advanced from "./tabs/Advanced.svelte";
   import {
     generateString,
-    getGrid,
     deployVM,
-    isValidSSH,
     checkNode,
     getDomainName,
     deployGateway,
-    isMnemonics,
     mastodon,
+    listenUntillUp,
   } from "./utils";
   import Basic from "./tabs/Basic.svelte";
 
@@ -39,10 +37,17 @@
   let success = false;
   let message = "";
   let deployedData: any;
+  let listener: (() => void) | undefined;
+  let isUp: boolean = false;
   async function onDeploy() {
     deploying = true;
     error = false;
     success = false;
+    if (listener) {
+      listener();
+      listener = undefined;
+    }
+    isUp = false;
     const { value } = mastodon;
 
     try {
@@ -58,8 +63,7 @@
       const vm = await deployVM({
         ...mastodon.value,
         image: {
-          flist:
-            "https://hub.grid.tf/omda.3bot/mahmoudemmad-mastodon-latest.flist",
+          flist: "https://hub.grid.tf/tf-official-apps/mastodon-latest.flist",
           entryPoint: "/sbin/zinit init",
         },
         rootFsSize: 2,
@@ -110,6 +114,13 @@
       deployedData = vm;
       success = true;
       message = "Successfully deployed Mastodon instance.";
+
+      const [up, done] = listenUntillUp(`https://${domainName}.${nodeDomain}`);
+      listener = done;
+      up.then(() => {
+        isUp = true;
+        listener = undefined;
+      });
     } catch (e) {
       message = e.message;
       error = true;
@@ -117,6 +128,8 @@
 
     events.removeAllListeners("logs");
   }
+
+  // listenUntillUp("https://md370mdlqe.gent01.dev.grid.tf")[0].then(console.log);
 </script>
 
 <b-box>
@@ -166,7 +179,20 @@
       </b-notification>
     </section>
 
-    <b-btns align="right" class:mt-2={true}>
+    <div class="is-flex mt-2 is-align-items-center">
+      <div style:width="100%" class="mr-2">
+        {#if listener}
+          <b-notification color="warning" light>
+            <b-icon icon="fas fa-spinner fa-pulse" /> We will let you know when your
+            mastodon instance up and running...
+          </b-notification>
+        {:else if isUp}
+          <b-notification color="success" light>
+            <b-icon icon="fa-solid fa-circle-check" /> Your mastodon instance is
+            up and running.
+          </b-notification>
+        {/if}
+      </div>
       <button
         use:btn={{
           color: deploying ? "info" : "primary",
@@ -180,12 +206,16 @@
               deploying = false;
               success = false;
               error = false;
+              if (listener) {
+                listener();
+                listener = undefined;
+              }
             }
           : undefined}
       >
         {deploying ? "Back" : "Deploy"}
       </button>
-    </b-btns>
+    </div>
   </form>
 
   {#if deployedData}
