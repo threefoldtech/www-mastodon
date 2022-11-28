@@ -64,6 +64,8 @@
         controller.setValue(nodes[0].nodeId);
       }
 
+      controller.markAsTouched();
+      controller.markAsDirty();
       loading = false;
       form.setDisabled(false);
     },
