@@ -213,7 +213,7 @@
           label="Public SSH Key"
           type="textarea"
           placeholder="Your public SSH Key"
-          sublabel="SSH keys are used to authenticate you to the mastodon instance for management purposes.<br />If you don't have one, or not familiar with it, we can generate one for you."
+          sublabel="SSH keys are used to authenticate you to the mastodon instance for management purposes.If you don't have one, or not familiar with it, we can generate one for you."
           controller={mastodon.get("sshKey")}
           loading={readingSSH || generatingSSH || storingSSH}
           disabled={readingSSH || generatingSSH || storingSSH}
