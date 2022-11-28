@@ -51,7 +51,7 @@
       {#each downloads as { src, alt, url }, index}
         <img
           {src}
-          width="300"
+          width="150"
           {alt}
           class:mr-2={index === 0}
           style:cursor="pointer"

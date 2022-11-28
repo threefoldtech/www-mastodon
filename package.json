@@ -29,7 +29,7 @@
     "buffer": "^6.0.3",
     "lodash": "^4.17.21",
     "qrcode": "^1.5.1",
-    "tf-svelte-bulma-wc": "^1.0.2",
+    "tf-svelte-bulma-wc": "^1.0.3",
     "tf-svelte-rx-forms": "^1.0.2",
     "tfgrid-gql": "^1.0.0",
     "ts-rmb-http-client": "^1.0.7",
