@@ -196,7 +196,7 @@
     {#if accountCreationStatus === "Done" && creationMsg}
       <b-notification color="warning" light class:my-2={true}>
         <b-icon icon="fa-sharp fa-solid fa-triangle-exclamation" />
-        creationMsg
+        {creationMsg}
       </b-notification>
     {/if}
 
