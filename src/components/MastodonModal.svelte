@@ -14,6 +14,7 @@
     label: string;
     controller: FormControl<any>;
     cmp: any;
+    url?: boolean;
   }
 
   let tab = "Details";
@@ -30,17 +31,18 @@
     if (v.publicIP) {
       if (v.publicIP.ip) inputs.push({ label: "IPv4", controller: fb.control(v.publicIP.ip), cmp: Input });
       else inputs.push({ label: "IPv4", controller: fb.control(false), cmp: CheckBox });
-  
       inputs.push({ label: "IPv6", controller: fb.control(v.publicIP.ip6), cmp: Input });
-      inputs.push({ label: "Planetary", controller: fb.control(v.planetary), cmp: Input });
     }
-
+    
+    inputs.push({ label: "Planetary", controller: fb.control(v.planetary), cmp: Input });
     inputs.push({ label: "CPU(vCores)", controller: fb.control(v.capacity.cpu), cmp: Input });
     inputs.push({ label: "Memory(MB)", controller: fb.control(v.capacity.memory), cmp: Input });
-    inputs.push({ label: "Domain", controller: fb.control(`https://${v.env.LOCAL_DOMAIN}`), cmp: Input });
+    inputs.push({ label: "Domain", controller: fb.control(`https://${v.env.LOCAL_DOMAIN}`), cmp: Input , url: true});
     inputs.push({ label: "Super Username", controller: fb.control(v.env.SUPERUSER_USERNAME), cmp: Input });
     inputs.push({ label: "Super Email", controller: fb.control(v.env.SUPERUSER_EMAIL), cmp: Input });
     inputs.push({ label: "Super Password", controller: fb.control(v.env.SUPERUSER_PASSWORD), cmp: Input });
+    inputs.push({ label: "Code-Server", controller: fb.control(`http://${v.publicIP?.ip ?? `[${v.planetary}]`}:8001`), cmp: Input, url: true });
+    inputs.push({ label: "Webmin", controller: fb.control(`http://${v.publicIP?.ip ?? `[${v.planetary}]`}:8002`), cmp: Input, url: true });
 
     inputs = [...inputs];
   });
@@ -95,7 +97,7 @@
                 validation={false}
               />
             </div>
-            {#if input.label === "Domain"}
+            {#if input.url}
               <button
                 type="button"
                 on:click={() => window.open(input.controller.value, "_blank")}
