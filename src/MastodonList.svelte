@@ -78,7 +78,7 @@
         <button
           class:mr-2={true}
           use:btn={{ color: "primary", loading, size: "small" }}
-          disabled={loading || deleting}
+          disabled={loading || deleting || !mnemonics$.valid}
           on:click={listMastodon}
         >
           <b-icon icon="fa-solid fa-arrows-rotate" />
