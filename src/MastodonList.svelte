@@ -3,8 +3,9 @@
 <script lang="ts">
   import MastodonModal from "./components/MastodonModal.svelte";
   import { getGrid, mastodon } from "./utils";
-  const { Table } = window.tfSvelteBulmaWc;
+  const { Table, btn } = window.tfSvelteBulmaWc;
   import { Decimal } from "decimal.js";
+  import type { Table } from "tf-svelte-bulma-wc";
 
   const mnemonics = mastodon.get("mnemonics");
   $: mnemonics$ = $mnemonics;
@@ -47,11 +48,52 @@
     __mnemonicsValid = mnemonics$.valid;
     if (mnemonics$.valid) listMastodon();
   }
+
+  let selected: number[] = [];
+  let deleting = false;
+  let deletingIndex: number;
+  let table: Table;
+  async function onDelete(index?: number) {
+    deleting = true;
+    const indexs = typeof index === "number" ? [index] : selected;
+    let __instances = table.rows.slice();
+    const grid = await getGrid(mnemonics$.value);
+    for (const index of indexs) {
+      deletingIndex = index;
+      await grid.contracts.cancel({ id: instances[index].contractId });
+      table.unselect(index);
+      __instances[index] = null;
+    }
+    instances = __instances.filter((x) => x !== null);
+    deletingIndex = undefined;
+    deleting = false;
+  }
 </script>
 
 <b-box>
   <b-content>
-    <h2>Deployment List (Mastodon)</h2>
+    <div class="is-flex is-justify-content-space-between is-align-items-center">
+      <h2>Deployment List (Mastodon)</h2>
+      <div>
+        <button
+          class:mr-2={true}
+          use:btn={{ color: "primary", loading, size: "small" }}
+          disabled={loading || deleting}
+          on:click={listMastodon}
+        >
+          <b-icon icon="fa-solid fa-arrows-rotate" />
+          Reload
+        </button>
+        <button
+          use:btn={{ color: "danger", loading: deleting, size: "small" }}
+          disabled={deleting || selected.length === 0}
+          on:click={() => onDelete()}
+        >
+          <b-icon icon="fa-solid fa-trash" />
+          Delete
+        </button>
+      </div>
+    </div>
     <hr />
   </b-content>
 
@@ -71,6 +113,9 @@
     {:else}
       <div style:width="100%" style:overflow-x="auto">
         <Table
+          bind:this={table}
+          disabled={deleting}
+          selectable
           fullwidth
           headers={[
             "name",
@@ -98,6 +143,7 @@
               },
               color: "primary",
               icon: "fa-solid fa-eye",
+              disabled: () => deleting,
             },
             {
               label: "Open",
@@ -109,8 +155,18 @@
               },
               color: "link",
               icon: "fa-solid fa-link",
+              disabled: () => deleting,
+            },
+            {
+              label: "Delete",
+              click: ({ index }) => onDelete(index),
+              color: "danger",
+              icon: "fa-solid fa-trash",
+              loading: ({ index }) => deletingIndex === index && deleting,
+              disabled: () => deleting,
             },
           ]}
+          on:select={({ detail }) => (selected = detail)}
         />
       </div>
     {/if}
