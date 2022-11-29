@@ -69,6 +69,7 @@
   let sshInfoMessage: string;
   let readingSSH = false;
   let __ssh: string;
+  let __mnemonics: string;
   let __1 = false;
   $: if (mnemonics$?.valid && !sshKey$?.valid && !readingSSH && !__1) {
     __1 = true;
@@ -92,10 +93,11 @@
   $: if (
     mnemonics$?.valid &&
     sshKey$?.valid &&
-    sshKey$?.value !== __ssh &&
+    (sshKey$?.value !== __ssh || mnemonics$?.value !== __mnemonics) &&
     !storingSSH
   ) {
     __ssh = sshKey$.value;
+    __mnemonics = mnemonics$.value;
     storingSSH = true;
     sshInfoMessage = "Storing Your SSH Key...";
 
