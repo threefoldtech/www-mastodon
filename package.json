@@ -27,6 +27,7 @@
   "dependencies": {
     "bip39": "^3.0.4",
     "buffer": "^6.0.3",
+    "decimal.js": "^10.4.2",
     "lodash": "^4.17.21",
     "qrcode": "^1.5.1",
     "tf-svelte-bulma-wc": "^1.0.3",

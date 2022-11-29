@@ -4,6 +4,7 @@
   import MastodonModal from "./components/MastodonModal.svelte";
   import { getGrid, mastodon } from "./utils";
   const { Table } = window.tfSvelteBulmaWc;
+  import { Decimal } from "decimal.js";
 
   const mnemonics = mastodon.get("mnemonics");
   $: mnemonics$ = $mnemonics;
@@ -11,6 +12,7 @@
   let loading = false;
   let deployedData: any;
   let instances: any[] = [];
+  let billingRate: any[] = [];
 
   async function listMastodon() {
     loading = true;
@@ -18,10 +20,25 @@
     const names = await grid.machines.list();
     const items = names.map((n) => grid.machines.getObj(n).catch(() => null));
     let _instances: any[] = [];
+    let _billingRate: any[] = [];
+    let rates: any[] = [];
     for await (const item of items) {
-      if (item?.at(0)) _instances.push(item.at(0));
+      const i = item?.at(0);
+      if (i) {
+        _instances.push(i);
+        rates.push(grid.contracts.getConsumption({ id: i.contractId }));
+      }
+    }
+    for await (const item of rates) {
+      const value = +item;
+      _billingRate.push(
+        isNaN(value) || value <= 0
+          ? "No Data Available"
+          : new Decimal(value).toFixed() + " TFT/hour"
+      );
     }
     instances = _instances;
+    billingRate = _billingRate;
     loading = false;
   }
 
@@ -63,14 +80,14 @@
             "Billing Rate",
           ]}
           position={false}
-          rows={instances.map((i) => {
+          rows={instances.map((i, index) => {
             const ip = i.publicIP?.ip;
             return [
               i.name,
               ip || "None",
               i.planetary,
               i.flist,
-              "Should be implemented",
+              billingRate[index],
             ];
           })}
           actions={[
