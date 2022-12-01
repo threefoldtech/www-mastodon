@@ -256,7 +256,4 @@ export const regions: { [key: string]: string[] } = {
     "Uruguay",
     "Venezuela (Bolivarian Republic of)",
   ],
-  Polar: ["Antarctica"],
-  "Antarctic Ocean": ["Bouvet Island"],
-  Antarctic: ["Heard Island and McDonald Islands"],
 };
