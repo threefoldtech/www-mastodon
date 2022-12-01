@@ -22,6 +22,8 @@
     loading = true;
     const grid = await getGrid(mnemonics$.value);
     const names = await grid.machines.list();
+    console.log(names);
+
     const items = names.map((n) => grid.machines.getObj(n).catch(() => null));
     let _instances: any[] = [];
     let _billingRate: any[] = [];
@@ -30,6 +32,9 @@
       const i = item?.at(0);
       if (i) {
         _instances.push(i);
+        // const gatewayC = await grid.gateway.getDeploymentContracts(i.name);
+        // const nameC = await grid.n
+        // get name contract
         rates.push(grid.contracts.getConsumption({ id: i.contractId }));
       }
     }

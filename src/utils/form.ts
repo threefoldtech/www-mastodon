@@ -4,6 +4,7 @@ import { isMnemonics, isValidSSH } from "./validators";
 
 const { fb, validators } = window.tfSvelteRxForms;
 
+export const noBalanceMessage = "Your balance is not enough.";
 export const mastodon = fb.group({
   mnemonics: [
     "",
@@ -18,10 +19,10 @@ export const mastodon = fb.group({
       },
       async (ctrl) => {
         const userBalance = await getBalance(ctrl.value);
-        if(userBalance.free < 1){
-          return { message: "Your balance is not enough." };
-        };
-      }
+        if (userBalance.free < 1) {
+          return { message: noBalanceMessage };
+        }
+      },
     ],
   ],
   sshKey: [
@@ -146,3 +147,7 @@ export const mastodon = fb.group({
 
   tfConnect: [false],
 });
+
+const mnemonics = mastodon.get("mnemonics");
+mnemonics.markAsDirty();
+mnemonics.markAsTouched();

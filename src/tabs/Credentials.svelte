@@ -3,7 +3,7 @@
 <script lang="ts">
   import type { MastodonForm } from "../Mastodon.svelte";
   const { Input, btn } = window.tfSvelteBulmaWc;
-  import { getGrid, Session } from "../utils";
+  import { getGrid, noBalanceMessage, Session } from "../utils";
   import Qrcode from "../components/Qrcode.svelte";
   import type { NetworkEnv } from "grid3_client";
   import { onMount } from "svelte";
@@ -32,9 +32,8 @@
     }
   }
 
-  $: valid = mastodon ? mastodon$.value.mnemonics.valid : false;
   let twinId: number;
-  $: if (valid) {
+  $: if (isMnemonicsValid) {
     getGrid(mastodon$.value.mnemonics.value)
       .then((grid) => grid.twins.get_my_twin_id())
       .then((t) => (twinId = t));
@@ -155,6 +154,10 @@
   $: sshKey$ = mastodon$?.value.sshKey;
   $: pending = mnemonics$?.pending;
   $: creating = accountCreationStatus === "Creating";
+  $: isMnemonicsValid = mnemonics$
+    ? mnemonics$.valid ||
+      (!mnemonics$.valid && mnemonics$.error === noBalanceMessage)
+    : false;
 </script>
 
 {#if mastodon}
@@ -203,7 +206,7 @@
       </b-notification>
     {/if}
 
-    {#if mnemonics$.valid && twinId}
+    {#if (mnemonics$.valid || (!mnemonics$.valid && mnemonics$.error === noBalanceMessage)) && twinId}
       <Qrcode
         data="TFT:GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC?message=twin_{twinId}&sender=me&amount=100"
       />
