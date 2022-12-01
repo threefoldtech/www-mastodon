@@ -3,7 +3,7 @@
 <script lang="ts">
   const qrcode = window.qrcode;
 
-  export let data: string = "hello world";
+  export let data: string;
   let loading = false;
   let src: string;
 
