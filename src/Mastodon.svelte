@@ -212,6 +212,7 @@
               deploying = false;
               success = false;
               error = false;
+              isUp = false;
               if (listener) {
                 listener();
                 listener = undefined;
