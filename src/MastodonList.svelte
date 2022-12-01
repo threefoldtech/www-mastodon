@@ -1,6 +1,7 @@
 <svelte:options tag="tf-mastodon-list" />
 
 <script lang="ts">
+  import { get_current_component } from "svelte/internal";
   import MastodonModal from "./components/MastodonModal.svelte";
   import { getGrid, mastodon } from "./utils";
   const { Table, btn } = window.tfSvelteBulmaWc;
@@ -9,6 +10,8 @@
 
   const mnemonics = mastodon.get("mnemonics");
   $: mnemonics$ = $mnemonics;
+
+  window.mastodonList = get_current_component();
 
   let loading = false;
   let deployedData: any;
@@ -67,6 +70,10 @@
     instances = __instances.filter((x) => x !== null);
     deletingIndex = undefined;
     deleting = false;
+  }
+
+  export function reload() {
+    listMastodon();
   }
 </script>
 

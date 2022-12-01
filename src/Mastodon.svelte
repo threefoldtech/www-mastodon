@@ -90,7 +90,7 @@
               ]
             : []),
         ],
-        solutionProviderID: +provider,
+        solutionProviderID: provider ? +provider : undefined,
         metadata: JSON.stringify({
           type: "vm",
           name: mastodon.value.name,
@@ -103,7 +103,7 @@
         mnemonics: value.mnemonics,
         planetaryIp: vm[0]["planetary"] as string,
         publicNodeId: +publicNodeId,
-        solutionProviderID: +provider,
+        solutionProviderID: provider ? +provider : undefined,
         metadata: JSON.stringify({
           type: "gateway",
           name: domainName,
@@ -114,6 +114,7 @@
       deployedData = vm;
       success = true;
       message = "Successfully deployed Mastodon instance.";
+      window.mastodonList?.reload();
 
       const [up, done] = listenUntillUp(`https://${domainName}.${nodeDomain}`);
       listener = done;

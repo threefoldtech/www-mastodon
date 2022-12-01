@@ -8,6 +8,7 @@ import type * as tsRmbHttpClient from "ts-rmb-http-client";
 import type * as webSshKeygen from "web-ssh-keygen";
 import type * as tfgridGql from "tfgrid-gql";
 import type qrcode from "qrcode";
+import type MastodonList from "./MastodonList.svelte";
 
 declare global {
   interface Window {
@@ -18,6 +19,7 @@ declare global {
     webSshKeygen: typeof webSshKeygen;
     tfgridGql: typeof tfgridGql;
     qrcode: typeof qrcode;
+    mastodonList?: MastodonList;
 
     config: {
       network: string;

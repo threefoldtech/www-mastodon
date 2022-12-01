@@ -1,3 +1,3 @@
 window.config = {
-  network: "dev",
+  network: "qa",
 };
