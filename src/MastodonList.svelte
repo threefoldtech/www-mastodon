@@ -3,7 +3,7 @@
 <script lang="ts">
   import { get_current_component } from "svelte/internal";
   import MastodonModal from "./components/MastodonModal.svelte";
-  import { getGrid, mastodon } from "./utils";
+  import { getGrid, getNameAndGatewayContracts, mastodon } from "./utils";
   const { Table, btn } = window.tfSvelteBulmaWc;
   import { Decimal } from "decimal.js";
   import type { Table } from "tf-svelte-bulma-wc";
@@ -32,35 +32,11 @@
       const i = item?.at(0);
       if (i) {
         _instances.push(i);
-        const twinId = await grid.twins.get_my_twin_id();
-        const gql = new TFGridGqlClient(
-          window.config.network as unknown as Networks
-        );
-        const contracts = await gql.merge({
-          nodeContracts: [
-            { contractID: true },
-            {
-              where: {
-                twinID_eq: twinId,
-                deploymentData_contains: `\"projectName\":\"Mastodon\"`,
-                AND: {
-                  deploymentData_contains: `\"name\":\"md${twinId}${i.name}\"`,
-                },
-              },
-            },
-          ],
-          nameContracts: [
-            { contractID: true },
-            { where: { twinID_eq: twinId, name_eq: `md${twinId}${i.name}` } },
-          ],
-        });
         rates.push(
           Promise.all(
-            [
-              i.contractId,
-              ...contracts.nameContracts.map((x) => +x.contractID),
-              ...contracts.nodeContracts.map((x) => +x.contractID),
-            ].map((id) => grid.contracts.getConsumption({ id }))
+            (await getNameAndGatewayContracts(mnemonics$.value, i.name))
+              .concat(i.contractId)
+              .map((id) => grid.contracts.getConsumption({ id }))
           ).then((p) => p.reduce((a, b) => a.add(b), new Decimal("0")))
         );
       }
@@ -94,7 +70,16 @@
     const grid = await getGrid(mnemonics$.value);
     for (const index of indexs) {
       deletingIndex = index;
-      await grid.contracts.cancel({ id: instances[index].contractId });
+      let contractIds = await getNameAndGatewayContracts(
+        mnemonics$.value,
+        instances[index].name
+      );
+      contractIds = contractIds.concat(instances[index].contractId);
+      await Promise.all(
+        contractIds.map((id) => {
+          return grid.contracts.cancel({ id }).catch(() => null);
+        })
+      );
       table.unselect(index);
       __instances[index] = null;
     }
