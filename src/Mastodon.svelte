@@ -37,6 +37,7 @@
   let success = false;
   let message = "";
   let deployedData: any;
+  let showDeployedData = false;
   let listener: (() => void) | undefined;
   let isUp: boolean = false;
   async function onDeploy() {
@@ -121,6 +122,7 @@
       up.then(() => {
         isUp = true;
         listener = undefined;
+        showDeployedData = true;
       });
     } catch (e) {
       message = e.message;
@@ -200,7 +202,10 @@
           loading: deploying && !error && !success,
         }}
         type={deploying ? "button" : "submit"}
-        disabled={!mastodon$.valid || (deploying && !error && !success)}
+        disabled={!mastodon$.valid ||
+          (deploying && !error && !success) ||
+          deployedData ||
+          showDeployedData}
         on:click={deploying
           ? (e) => {
               e.preventDefault();
@@ -219,9 +224,12 @@
     </div>
   </form>
 
-  {#if deployedData}
+  {#if deployedData && showDeployedData}
     <MastodonModal
-      on:close={() => (deployedData = undefined)}
+      on:close={() => {
+        deployedData = undefined;
+        showDeployedData = false;
+      }}
       data={deployedData}
     />
   {/if}
