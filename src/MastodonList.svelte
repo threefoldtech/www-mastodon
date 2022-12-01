@@ -67,7 +67,8 @@
       table.unselect(index);
       __instances[index] = null;
     }
-    instances = __instances.filter((x) => x !== null);
+    table.rows = __instances.filter((x) => x !== null);
+    instances = instances.filter((_, i) => __instances[i] !== null);
     deletingIndex = undefined;
     deleting = false;
   }
