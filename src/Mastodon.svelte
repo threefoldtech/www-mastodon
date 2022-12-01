@@ -146,9 +146,8 @@
       privacy options, and moderation policies.
     </p>
     <PriceCalculator {mastodon} />
-    <hr />
   </b-content>
-  <section class:d-none={deploying}>
+  <section class:d-none={deploying} style:margin-top="35px">
     <Tabs
       bind:active
       tabs={[
