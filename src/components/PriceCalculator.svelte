@@ -61,7 +61,7 @@
               </strong>
               {mastodon$.value.mnemonics.valid
                 ? `USD/Month ${
-                    index === 1 ? "for 50K Balance after applying discount" : ""
+                    index === 1 ? "with a 50k balance of TFT, after applying discount" : ""
                   }`
                 : ""}
             </b-tag>

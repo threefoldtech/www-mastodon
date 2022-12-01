@@ -12,8 +12,8 @@
   <section style:display={show ? "initial" : "none"}>
     <Input
       label="Mastodon Instance Name"
-      sublabel="Instance name is used as for managing the deployed instance and to create a subdomain"
-      placeholder="Instance name is used as for managing the deployed instance and to create a subdomain"
+      sublabel="Instance name is used for managing the deployed instance and to create a subdomain"
+      placeholder="Instance name is used for managing the deployed instance and to create a subdomain"
       controller={mastodon.get("name")}
     />
 
@@ -42,7 +42,7 @@
     />
 
     <CheckBox
-      label="Enable Threefold Connect"
+      label="Enable ThreeFold Connect"
       controller={mastodon.get("tfConnect")}
     />
 
