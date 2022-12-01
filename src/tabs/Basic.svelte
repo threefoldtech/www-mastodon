@@ -41,11 +41,23 @@
       ]}
     />
 
-    <CheckBox
-      label="Enable ThreeFold Connect"
-      controller={mastodon.get("tfConnect")}
-    />
+    <b-tooltip
+      class:is-block={true}
+      class:mb-2={true}
+      tooltip="Enable ThreeFold Connect on your Mastodon instance."
+      flow="right"
+    >
+      <CheckBox
+        label="Enable ThreeFold Connect"
+        controller={mastodon.get("tfConnect")}
+      />
+    </b-tooltip>
 
-    <CheckBox label="Certified" controller={mastodon.get("certified")} />
+    <b-tooltip
+      tooltip="Deploys your instance on a Certified Threefold Node."
+      flow="right"
+    >
+      <CheckBox label="Certified" controller={mastodon.get("certified")} />
+    </b-tooltip>
   </section>
 {/if}
