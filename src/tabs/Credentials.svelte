@@ -58,7 +58,7 @@
       mastodon.get("mnemonics").setValue(createdAccount.mnemonic);
       await mastodon.get("mnemonics").validate();
       creationMsg =
-        "Please make sure to store your mnemonics somewhere safe to be able to access your deployments";
+        "Please make sure to store your mnemonics somewhere safe to be able to access your deployments later on. There is no way for neither you nor ThreeFold nor anybody else to recover lost mnemonics.";
       accountCreationStatus = "Done";
     } catch (e) {
       accountCreationStatus = "Error";
@@ -164,7 +164,7 @@
         <Input
           label="Mnemonics"
           placeholder="Mnemonics"
-          sublabel="Mnemonics are your private key, they are used represent you on Threefold Grid. You can paste existing mnemonics or click on the generate button to create a new account."
+          sublabel="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics.`
           type="password"
           controller={mastodon.get("mnemonics")}
           disabled={pending || creating}
@@ -215,7 +215,7 @@
           label="Public SSH Key"
           type="textarea"
           placeholder="Your public SSH Key"
-          sublabel="SSH keys are used to authenticate you to the mastodon instance for management purposes.If you don't have one, or not familiar with it, we can generate one for you."
+          sublabel="SSH Keys are used to authenticate you to the Mastodon instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
           controller={mastodon.get("sshKey")}
           loading={readingSSH || generatingSSH || storingSSH}
           disabled={readingSSH || generatingSSH || storingSSH}

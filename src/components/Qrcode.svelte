@@ -36,12 +36,12 @@
     <p>Please Pass some data</p>
   {:else if src}
     <h4 class="has-text-centered has-text-weight-bold">
-      Scan QRcode using <a
+      Scan the QRcode using <a
         target="_blank"
         href="https://library.threefold.me/info/threefold#/tokens/threefold__threefold_connect"
         rel="noreferrer"
       >
-        Threefold connect
+        ThreeFold Connect
       </a> to fund your account
     </h4>
     <div class="is-flex is-justify-content-center">
