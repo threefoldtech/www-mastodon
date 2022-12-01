@@ -7,6 +7,8 @@
   const { Table, btn } = window.tfSvelteBulmaWc;
   import { Decimal } from "decimal.js";
   import type { Table } from "tf-svelte-bulma-wc";
+  import type { Networks } from "tfgrid-gql";
+  const { default: TFGridGqlClient } = window.tfgridGql;
 
   const mnemonics = mastodon.get("mnemonics");
   $: mnemonics$ = $mnemonics;
@@ -22,28 +24,52 @@
     loading = true;
     const grid = await getGrid(mnemonics$.value);
     const names = await grid.machines.list();
-    console.log(names);
-
     const items = names.map((n) => grid.machines.getObj(n).catch(() => null));
     let _instances: any[] = [];
     let _billingRate: any[] = [];
-    let rates: any[] = [];
+    let rates: Promise<Decimal>[] = [];
     for await (const item of items) {
       const i = item?.at(0);
       if (i) {
         _instances.push(i);
-        // const gatewayC = await grid.gateway.getDeploymentContracts(i.name);
-        // const nameC = await grid.n
-        // get name contract
-        rates.push(grid.contracts.getConsumption({ id: i.contractId }));
+        const twinId = await grid.twins.get_my_twin_id();
+        const gql = new TFGridGqlClient(
+          window.config.network as unknown as Networks
+        );
+        const contracts = await gql.merge({
+          nodeContracts: [
+            { contractID: true },
+            {
+              where: {
+                twinID_eq: twinId,
+                deploymentData_contains: `\"projectName\":\"Mastodon\"`,
+                AND: {
+                  deploymentData_contains: `\"name\":\"md${twinId}${i.name}\"`,
+                },
+              },
+            },
+          ],
+          nameContracts: [
+            { contractID: true },
+            { where: { twinID_eq: twinId, name_eq: `md${twinId}${i.name}` } },
+          ],
+        });
+        rates.push(
+          Promise.all(
+            [
+              i.contractId,
+              ...contracts.nameContracts.map((x) => +x.contractID),
+              ...contracts.nodeContracts.map((x) => +x.contractID),
+            ].map((id) => grid.contracts.getConsumption({ id }))
+          ).then((p) => p.reduce((a, b) => a.add(b), new Decimal("0")))
+        );
       }
     }
     for await (const item of rates) {
-      const value = +item;
       _billingRate.push(
-        isNaN(value) || value <= 0
+        item.isNaN() || item.lessThanOrEqualTo(0)
           ? "No Data Available"
-          : new Decimal(value).toFixed() + " TFT/hour"
+          : item.toFixed() + " TFT/hour"
       );
     }
     instances = _instances;
