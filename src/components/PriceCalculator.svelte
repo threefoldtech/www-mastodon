@@ -4,6 +4,7 @@
   import debounce from "lodash/debounce.js";
   import { getGrid } from "../utils";
   import type { MastodonForm } from "../Mastodon.svelte";
+  import Balance from "./Balance.svelte";
 
   export let mastodon: MastodonForm;
 
@@ -49,6 +50,7 @@
 <div>
   {#if mastodon}
     {#if mastodon$.value.mnemonics.valid}
+      <Balance />
       {#each [price, price50K] as p, index}
         <div style:margin-bottom={index === 0 ? -5 : undefined}>
           <b-tags addons align="centered" size="large">
