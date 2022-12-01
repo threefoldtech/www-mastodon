@@ -43,3 +43,8 @@ export function getGateways(mnemonic: string) {
     .then(getNodes)
     .then((n) => n.getAccessNodes());
 }
+
+export function getBalance(mnemonic: string) {
+  return getGrid(mnemonic)
+  .then(grid => grid.balance.getMyBalance())
+}
