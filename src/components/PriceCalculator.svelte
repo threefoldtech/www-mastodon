@@ -57,7 +57,7 @@
                 ? "The deployment will cost "
                 : ""}
               <strong class="mr-1 ml-1">
-                {loading ? "Loading..." : p}
+                {loading ? "Loading..." : p.toFixed(2)}
               </strong>
               {mastodon$.value.mnemonics.valid
                 ? `USD/Month ${
