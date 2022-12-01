@@ -186,8 +186,8 @@
       <div style:width="100%" class="mr-2">
         {#if listener}
           <b-notification color="warning" light>
-            <b-icon icon="fas fa-spinner fa-pulse" /> We will let you know when your
-            mastodon instance up and running...
+            <b-icon icon="fas fa-spinner fa-pulse" /> Waiting for your mastodon instance
+            to be up and running...
           </b-notification>
         {:else if isUp}
           <b-notification color="success" light>
