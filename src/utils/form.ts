@@ -1,4 +1,4 @@
-import { getGrid } from "./grid";
+import { getGrid, getBalance } from ".";
 import { generateString } from "./helpers";
 import { isMnemonics, isValidSSH } from "./validators";
 
@@ -16,6 +16,12 @@ export const mastodon = fb.group({
           return { message: "Couldn't load grid using these mnemonic." };
         }
       },
+      async (ctrl) => {
+        const userBalance = await getBalance(ctrl.value);
+        if(userBalance.free < 1){
+          return { message: "Your balance is not enough." };
+        };
+      }
     ],
   ],
   sshKey: [
