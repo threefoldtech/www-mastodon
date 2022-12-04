@@ -3,22 +3,64 @@
 <script lang="ts">
   import { get_current_component } from "svelte/internal";
   import MastodonModal from "./components/MastodonModal.svelte";
+  import MastodonDeleteModal from "./components/MastodonDeleteModal.svelte";
   import { getGrid, getNameAndGatewayContracts, mastodon } from "./utils";
-  const { Table, btn } = window.tfSvelteBulmaWc;
   import { Decimal } from "decimal.js";
   import type { Table } from "tf-svelte-bulma-wc";
-  import type { Networks } from "tfgrid-gql";
-  const { default: TFGridGqlClient } = window.tfgridGql;
-
+  
+  const { Table, btn } = window.tfSvelteBulmaWc;
   const mnemonics = mastodon.get("mnemonics");
   $: mnemonics$ = $mnemonics;
 
   window.mastodonList = get_current_component();
 
   let loading = false;
+  let _openDeleteModal = false;
   let deployedData: any;
   let instances: any[] = [];
   let billingRate: any[] = [];
+  let _index: number;
+  let selectedInstances: string[] = [];
+
+  function openDeleteModal(index?: number){
+    const indexs = typeof index === "number" ? [index] : selected;
+    for (const index of indexs) {
+      if(!selectedInstances.includes(instances[index].name)){
+        selectedInstances.push(instances[index].name)
+      };
+    };
+
+    _openDeleteModal = true;
+    _index = index
+  };
+
+  async function onDelete(index?) {
+    deleting = true;
+    const indexs = typeof index === "number" ? [index] : selected;
+    let __instances = table.rows.slice();
+    const grid = await getGrid(mnemonics$.value);
+
+    for (const index of indexs) {
+        deletingIndex = index;
+        let contractIds = await getNameAndGatewayContracts(
+            mnemonics$.value,
+            instances[index].name
+        );
+        contractIds = contractIds.concat(instances[index].contractId);
+        await Promise.all(
+            contractIds.map((id) => {
+            return grid.contracts.cancel({ id }).catch(() => null);
+            })
+        );
+        table.unselect(index);
+        __instances[index] = null;
+    };
+
+    table.rows = __instances.filter((x) => x !== null);
+    instances = instances.filter((_, i) => __instances[i] !== null);
+    deletingIndex = undefined;
+    deleting = false;
+  };
 
   async function listMastodon() {
     loading = true;
@@ -63,31 +105,6 @@
   let deleting = false;
   let deletingIndex: number;
   let table: Table;
-  async function onDelete(index?: number) {
-    deleting = true;
-    const indexs = typeof index === "number" ? [index] : selected;
-    let __instances = table.rows.slice();
-    const grid = await getGrid(mnemonics$.value);
-    for (const index of indexs) {
-      deletingIndex = index;
-      let contractIds = await getNameAndGatewayContracts(
-        mnemonics$.value,
-        instances[index].name
-      );
-      contractIds = contractIds.concat(instances[index].contractId);
-      await Promise.all(
-        contractIds.map((id) => {
-          return grid.contracts.cancel({ id }).catch(() => null);
-        })
-      );
-      table.unselect(index);
-      __instances[index] = null;
-    }
-    table.rows = __instances.filter((x) => x !== null);
-    instances = instances.filter((_, i) => __instances[i] !== null);
-    deletingIndex = undefined;
-    deleting = false;
-  }
 
   export function reload() {
     listMastodon();
@@ -111,7 +128,7 @@
         <button
           use:btn={{ color: "danger", loading: deleting, size: "small" }}
           disabled={deleting || selected.length === 0}
-          on:click={() => onDelete()}
+          on:click={() => openDeleteModal()}
         >
           <b-icon icon="fa-solid fa-trash" />
           Delete
@@ -183,7 +200,7 @@
             },
             {
               label: "Delete",
-              click: ({ index }) => onDelete(index),
+              click: ({ index }) => openDeleteModal(index),
               color: "danger",
               icon: "fa-solid fa-trash",
               loading: ({ index }) => deletingIndex === index && deleting,
@@ -199,6 +216,20 @@
       <MastodonModal
         on:close={() => (deployedData = undefined)}
         data={deployedData}
+      />
+    {/if}
+
+    {#if _openDeleteModal}
+      <MastodonDeleteModal
+        on:close={() => (_openDeleteModal = undefined)}
+        on:isDelete={({detail}) => {
+          _openDeleteModal = false;
+          detail === true ? onDelete(_index) : false;
+        }}
+        on:close={() => {
+          selectedInstances = [];
+        }}
+        {selectedInstances}
       />
     {/if}
   {/if}
