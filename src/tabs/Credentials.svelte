@@ -39,7 +39,9 @@
       ? "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
       : "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
   let twinId: number;
-  $: if (isMnemonicsValid) {
+  let __mnemonics2: string;
+  $: if (isMnemonicsValid && __mnemonics2 !== mnemonics$.value) {
+    __mnemonics2 = mnemonics$.value;
     getGrid(mastodon$.value.mnemonics.value)
       .then((grid) => grid.twins.get_my_twin_id())
       .then((t) => (twinId = t));
