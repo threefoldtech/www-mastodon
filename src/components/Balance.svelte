@@ -29,7 +29,7 @@
   }
 </script>
 
-{#if free && locked}
+{#if free != undefined && locked != undefined}
   <div
     class="card"
     style:padding="15px"
@@ -39,12 +39,12 @@
   >
     <p>
       Balance: <span style="font-weight: bold;"
-        >{free ? free.toFixed(3) + " TFT" : "Loading.."}</span
+        >{free.toFixed(3) + " TFT"}</span
       >
     </p>
     <p>
       Locked: <span style="font-weight: bold;"
-        >{locked ? locked.toFixed(3) + " TFT" : "Loading.."}</span
+        >{locked.toFixed(3) + " TFT"}</span
       >
     </p>
     <button
