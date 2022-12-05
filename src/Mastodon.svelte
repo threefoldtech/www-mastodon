@@ -115,11 +115,11 @@
       deployedData = vm;
       success = true;
       message = "Successfully deployed Mastodon instance.";
-      window.mastodonList?.reload();
 
       const [up, done] = listenUntillUp(`https://${domainName}.${nodeDomain}`);
       listener = done;
       up.then(() => {
+        window.mastodonList?.reload();
         isUp = true;
         listener = undefined;
         showDeployedData = true;
