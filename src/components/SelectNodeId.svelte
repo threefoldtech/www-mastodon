@@ -78,22 +78,27 @@
     const where = { updatedAt_gt: Date.now() - 1 * 60 * 60 * 1000 };
     const orderBy: ["nodeID_ASC"] = ["nodeID_ASC"];
 
-    farms = await gql
-      .nodesConnection({ totalCount: true }, { where, orderBy })
-      .then(({ totalCount: limit }) => {
-        return gql.nodes({ farmID: true }, { where, orderBy, limit });
-      })
-      .then((nodes) => {
-        return gql.farms(
-          { name: true, farmID: true },
-          {
-            where: {
-              farmID_in: Array.from(new Set(nodes.map((n) => n.farmID))),
-            },
-            orderBy: ["farmID_ASC"],
-          }
-        );
-      });
+    const { totalCount: limit } = await gql.nodesConnection(
+      { totalCount: true },
+      { where, orderBy }
+    );
+
+    farms =
+      limit === 0
+        ? []
+        : await gql
+            .nodes({ farmID: true }, { where, orderBy, limit })
+            .then((nodes) => {
+              return gql.farms(
+                { name: true, farmID: true },
+                {
+                  where: {
+                    farmID_in: Array.from(new Set(nodes.map((n) => n.farmID))),
+                  },
+                  orderBy: ["farmID_ASC"],
+                }
+              );
+            });
 
     farmLoaded = true;
     loadNodes(f);
