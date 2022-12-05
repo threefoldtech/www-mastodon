@@ -172,7 +172,7 @@
       {/if}
     </section>
 
-    <section style:margin-top="40px" class:d-none={!deploying}>
+    <section class:d-none={!deploying}>
       <b-notification
         color={error ? "danger" : success ? "success" : "info"}
         light

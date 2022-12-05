@@ -50,26 +50,34 @@
 <div>
   {#if mastodon}
     {#if mastodon$.value.mnemonics.valid}
-      <Balance />
-      {#each [price, price50K] as p, index}
-        <div style:margin-bottom={index === 0 ? -5 : undefined}>
-          <b-tags addons align="centered" size="large">
-            <b-tag>
-              {mastodon$.value.mnemonics.valid && !loading
-                ? "The deployment will cost "
-                : ""}
-              <strong class="mr-1 ml-1">
-                {loading ? "Loading..." : p.toFixed(2)}
-              </strong>
-              {mastodon$.value.mnemonics.valid
-                ? `USD/Month ${
-                    index === 1 ? "with a 50k balance of TFT, after applying discount" : ""
-                  }`
-                : ""}
-            </b-tag>
-          </b-tags>
+      <div class="columns is-vcentered" style:margin-bottom="10px">
+        <div class="column is-10">
+          {#each [price, price50K] as p, index}
+            <div style:margin-bottom={index === 0 ? -5 : undefined}>
+              <b-tags addons align="centered" size="large">
+                <b-tag>
+                  {mastodon$.value.mnemonics.valid && !loading
+                    ? "The deployment will cost "
+                    : ""}
+                  <strong class="mr-1 ml-1">
+                    {loading ? "Loading..." : p.toFixed(2)}
+                  </strong>
+                  {mastodon$.value.mnemonics.valid
+                    ? `USD/Month ${
+                        index === 1 ? "with a 50k balance of TFT, after applying discount" : ""
+                      }`
+                    : ""}
+                </b-tag>
+              </b-tags>
+            </div>
+          {/each}
         </div>
-      {/each}
+        <div class="column" style:display="flex"
+        style:justify-content="end">
+          <Balance />
+        </div>
+
+      </div>
     {/if}
   {/if}
 </div>

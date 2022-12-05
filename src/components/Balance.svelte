@@ -32,10 +32,11 @@
 {#if free != undefined && locked != undefined}
   <div
     class="card"
-    style:padding="15px"
+    style:padding="10px"
+    style:width="70%"
     style:background="rgb(245 245 245)"
-    style:float="right"
-    style:margin-top="-30px"
+    style:text-align="center"
+
   >
     <p>
       Balance: <span style="font-weight: bold;"
