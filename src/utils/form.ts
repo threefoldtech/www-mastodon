@@ -149,5 +149,12 @@ export const mastodon = fb.group({
 });
 
 const mnemonics = mastodon.get("mnemonics");
-mnemonics.markAsDirty();
-mnemonics.markAsTouched();
+
+mnemonics.subscribe(mn => {
+  if(mn.value.length > 0 && !mnemonics.valid){
+    mnemonics.markAsDirty();
+    mnemonics.markAsTouched();
+  };
+});
+
+
