@@ -227,7 +227,7 @@
           sublabel="SSH Keys are used to authenticate you to the Mastodon instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
           controller={mastodon.get("sshKey")}
           loading={readingSSH || generatingSSH || storingSSH}
-          disabled={readingSSH || generatingSSH || storingSSH}
+          disabled={!mnemonics$.valid || readingSSH || generatingSSH || storingSSH}
           hint={sshMessage ||
             (readingSSH || generatingSSH || storingSSH
               ? sshInfoMessage
@@ -249,7 +249,7 @@
           loading: readingSSH || generatingSSH || storingSSH,
         }}
         on:click={onGenerateSSH}
-        disabled={readingSSH || generatingSSH || storingSSH || sshKey$.valid}
+        disabled={!mnemonics$.valid || readingSSH || generatingSSH || storingSSH || sshKey$.valid}
       >
         Generate SSH Key
       </button>
