@@ -224,6 +224,7 @@
         on:close={() => (_openDeleteModal = undefined)}
         on:isDelete={({detail}) => {
           _openDeleteModal = false;
+          selectedInstances = [];
           detail === true ? onDelete(_index) : false;
         }}
         on:close={() => {
