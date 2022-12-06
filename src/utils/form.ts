@@ -1,6 +1,8 @@
+import type { Unsubscriber } from "tf-svelte-rx-forms/dist/internals/rx_store";
 import { getGrid, getBalance } from ".";
 import { generateString } from "./helpers";
 import { isMnemonics, isValidSSH } from "./validators";
+import { get } from "svelte/store"
 
 const { fb, validators } = window.tfSvelteRxForms;
 
@@ -149,12 +151,12 @@ export const mastodon = fb.group({
 });
 
 const mnemonics = mastodon.get("mnemonics");
-
-mnemonics.subscribe(mn => {
-  if(mn.value.length > 0 && !mnemonics.valid){
+let unsub: Unsubscriber;
+unsub = mnemonics.subscribe(mn => {
+  if (mn.value.length > 0 && !mnemonics.valid) {
+    console.log("im here", unsub);
     mnemonics.markAsDirty();
     mnemonics.markAsTouched();
+    unsub?.();
   };
 });
-
-
