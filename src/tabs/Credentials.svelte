@@ -2,18 +2,18 @@
 
 <script lang="ts">
   import type { MastodonForm } from "../Mastodon.svelte";
-  const { Input, btn } = window.tfSvelteBulmaWc;
   import { getGrid, noBalanceMessage, Session } from "../utils";
   import Qrcode from "../components/Qrcode.svelte";
   import type { NetworkEnv } from "grid3_client";
-  import { onMount } from "svelte";
-  import type { FormControl } from "tf-svelte-rx-forms";
-  const { HTTPMessageBusClient } = window.tsRmbHttpClient;
-  const { generateKeyPair } = window.webSshKeygen;
-
+  
   export let show: boolean;
   export let mastodon: MastodonForm;
   // export let loadSSH: boolean;
+
+  const { Input, btn } = window.tfSvelteBulmaWc;
+  const { HTTPMessageBusClient } = window.tsRmbHttpClient;
+  const { generateKeyPair } = window.webSshKeygen;
+
 
   let __init = false;
   $: if (mastodon) {
