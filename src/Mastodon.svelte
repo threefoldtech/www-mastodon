@@ -23,6 +23,8 @@
 <script lang="ts">
   import MastodonModal from "./components/MastodonModal.svelte";
   import PriceCalculator from "./components/PriceCalculator.svelte";
+  import type { FormControlValue } from "tf-svelte-rx-forms/dist/types";
+  import { requiredTrue } from "tf-svelte-rx-forms/dist/validators";
 
   export let provider: string;
 
@@ -41,6 +43,38 @@
   let listener: (() => void) | undefined;
   let isUp: boolean = false;
   async function onDeploy() {
+    if (!mastodon.valid) {
+      mastodon.markAsDirty();
+      mastodon.markAsTouched();
+
+      requestAnimationFrame(() => {
+        if (basicHasError) {
+          requestAnimationFrame(() => {
+            active = "basic";
+            // prettier-ignore
+            requestAnimationFrame(() => {
+            if (!v$.name.valid) mastodon.get("name")["__input"]?.focus();
+            else if (!v$.admin.value.email.valid) mastodon.get("admin").get("email")["__input"]?.focus();
+          });
+          });
+        } else if (advancedHasError) {
+          requestAnimationFrame(() => {
+            active = "advanced";
+            // prettier-ignore
+            requestAnimationFrame(() => {
+            if (!v$.cpu.valid) mastodon.get("cpu")["__input"]?.focus();
+            else if (!v$.memory.valid) mastodon.get("memory")["__input"]?.focus();
+            else if (!v$.disk.valid) mastodon.get("disk")["__input"]?.focus();
+            else if (!v$.admin.value.username.valid) mastodon.get("admin").get("username")["__input"]?.focus();
+            else if (!v$.admin.value.password.valid) mastodon.get("admin").get("password")["__input"]?.focus();
+          });
+          });
+        }
+      });
+
+      return;
+    }
+
     deploying = true;
     error = false;
     success = false;
@@ -132,7 +166,27 @@
     events.removeAllListeners("logs");
   }
 
-  // listenUntillUp("https://md370mdlqe.gent01.dev.grid.tf")[0].then(console.log);
+  function isNotValid(...fields$: FormControlValue<any>[]): boolean {
+    for (const field$ of fields$) {
+      if (!field$.valid && (field$.touched || field$.dirty)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  $: v$ = mastodon$.value;
+  $: credentialsHasError = isNotValid(v$.mnemonics, v$.sshKey);
+  $: basicHasError = isNotValid(v$.name, v$.admin.value.email);
+  $: advancedHasError = isNotValid(
+    v$.cpu,
+    v$.memory,
+    v$.disk,
+    v$.gateway,
+    v$.nodeId,
+    v$.admin.value.username,
+    v$.admin.value.password
+  );
 </script>
 
 <b-box>
@@ -151,11 +205,15 @@
     <Tabs
       bind:active
       tabs={[
-        { id: "credentials", label: "Credentials" },
+        {
+          id: "credentials",
+          label: "Credentials",
+          error: credentialsHasError,
+        },
         ...(validCredentials
           ? [
-              { id: "basic", label: "Basic" },
-              { id: "advanced", label: "Advanced" },
+              { id: "basic", label: "Basic", error: basicHasError },
+              { id: "advanced", label: "Advanced", error: advancedHasError },
             ]
           : []),
       ]}
@@ -201,7 +259,7 @@
           loading: deploying && !error && !success,
         }}
         type={deploying ? "button" : "submit"}
-        disabled={!mastodon$.valid ||
+        disabled={credentialsHasError ||
           (deploying && !error && !success) ||
           deployedData ||
           showDeployedData}
