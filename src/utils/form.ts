@@ -144,7 +144,7 @@ export const mastodon = fb.group({
     port: [null as number, [validators.isPort("Invalid SMTP port.")]],
   }),
 
-  region: [null as string],
+  region: [null as string, [getErrorFromCtx]],
 
   certified: [false, [getErrorFromCtx]],
 
@@ -162,9 +162,11 @@ unsub = mnemonics.subscribe((mn) => {
 });
 
 export function getErrorFromCtx<T extends FCE>(
-  ctrl: FormControl<T>,
+  _: FormControl<T>,
   ctx?: { error: string }
 ) {
+  console.log({ ctrl: _, ctx });
+
   if (ctx?.error) {
     return { message: ctx.error };
   }

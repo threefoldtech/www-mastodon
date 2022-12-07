@@ -61,6 +61,13 @@
         nodes = nodes.filter((node) =>
           allowedCountried?.includes(node.location.country)
         );
+
+        if (nodes.length === 0) {
+          const error = `No nodes were found in '${region}' region.`;
+          if (form.get("region").getValue().error !== error) {
+            form.get("region").setValue(region, { error });
+          }
+        }
       }
 
       if (nodes.some((n) => n.nodeId === nodeId)) {

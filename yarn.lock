@@ -1262,20 +1262,12 @@ svelte@^3.52.0:
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.53.1.tgz#db9d7df7a8f570e8e22547444c149208b1914442"
   integrity sha512-Q4/hHkktZogGhN5iqxqSi9sjEVoe/NbIxX4hXEHoasTxj+TxEQVAq66LnDMdAZxjmsodkoI5F3slqsS68U7FNw==
 
-tf-svelte-bulma-wc@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/tf-svelte-bulma-wc/-/tf-svelte-bulma-wc-1.0.7.tgz#1d33f672a1da7746365b195a3e93b10c44d5beab"
-  integrity sha512-ueo+UwIXNZxXxGHFce9GCSJnUToK/3pVVFneMOSvsrK2Q1ApPu7EBlo9niFJR4RE15VazUjBb2MlkXUy5Cf5lQ==
+tf-svelte-bulma-wc@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/tf-svelte-bulma-wc/-/tf-svelte-bulma-wc-1.0.8.tgz#593b2038b993c97bac3b5e63669b09f7fd6e6329"
+  integrity sha512-GXV23i9XwQSp2vB0jc7gszreok7EVc0EtVW7oQ4du9HNEjqWmoVKjKg9jbIPsByu1MVf7jEMHH7oJfImHQkyzg==
   dependencies:
-    tf-svelte-rx-forms "^1.0.2"
-
-tf-svelte-rx-forms@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/tf-svelte-rx-forms/-/tf-svelte-rx-forms-1.0.2.tgz#a1352ffdc2d910c198edaf3e75fddee2868135b2"
-  integrity sha512-kq2jfws89lv9OWOvL45lNcaCBegyJCUXRK3I2cr6Vgr5jxL+Im3Z7BAVU4FqfnrJYZ0i4OGEWqaIJ4mcSoDcZA==
-  dependencies:
-    "@types/validator" "^13.7.7"
-    validator "^13.7.0"
+    tf-svelte-rx-forms "^1.0.3"
 
 tf-svelte-rx-forms@^1.0.3:
   version "1.0.3"
