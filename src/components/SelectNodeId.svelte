@@ -3,7 +3,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import type { MastodonForm } from "../Mastodon.svelte";
-  import { findNodes } from "../utils";
+  import { findNodes, getErrorFromCtx } from "../utils";
   const { Select } = window.tfSvelteBulmaWc;
   const { fb, FormGroup, validators } = window.tfSvelteRxForms;
   import debounce from "lodash/debounce.js";
@@ -48,6 +48,11 @@
 
       if (form.get("certified").value) {
         nodes = nodes.filter((node) => node.certificationType === "Certified");
+        if (nodes.length === 0) {
+          const error = "No certified nodes were found.";
+          if (form.get("certified").getValue().error !== error)
+            form.get("certified").setValue(true, { error });
+        }
       }
 
       const region = form.get("region").value;

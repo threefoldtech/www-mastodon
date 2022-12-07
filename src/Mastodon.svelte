@@ -176,7 +176,12 @@
 
   $: v$ = mastodon$.value;
   $: credentialsHasError = isNotValid(v$.mnemonics, v$.sshKey);
-  $: basicHasError = isNotValid(v$.name, v$.admin.value.email);
+  $: basicHasError = isNotValid(
+    v$.name,
+    v$.admin.value.email,
+    v$.region,
+    v$.certified
+  );
   $: advancedHasError = isNotValid(
     v$.cpu,
     v$.memory,
