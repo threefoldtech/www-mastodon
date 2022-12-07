@@ -33,7 +33,6 @@
   <div
     class="card"
     style:padding="10px"
-    style:width="70%"
     style:background="rgb(245 245 245)"
     style:text-align="center"
 
