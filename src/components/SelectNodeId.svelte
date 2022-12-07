@@ -54,7 +54,7 @@
       if (region !== null) {
         const allowedCountried = regions[region];
         nodes = nodes.filter((node) =>
-          allowedCountried.includes(node.location.country)
+          allowedCountried?.includes(node.location.country)
         );
       }
 
@@ -133,6 +133,7 @@
   $: controller$ = $controller;
   $: if (mastodon && controller$.valid) {
     mastodon.get("nodeId").setValue(controller$.value);
+    mastodon.get("nodeId").markAsDirty();
   }
 </script>
 
