@@ -1,5 +1,8 @@
+import type { FormControl } from "tf-svelte-rx-forms";
 import type { Unsubscriber } from "tf-svelte-rx-forms/dist/internals/rx_store";
+import type { FCE } from "tf-svelte-rx-forms/dist/modules/form_control";
 import { getGrid, getBalance } from ".";
+import { checkNode } from "./deploy";
 import { generateString } from "./helpers";
 import { isMnemonics, isValidSSH } from "./validators";
 
@@ -78,7 +81,11 @@ export const mastodon = fb.group({
   planetary: [true],
   ipv4: [false],
   gateway: [null as string, [validators.required("Gateway is required.")]],
-  nodeId: [null as number, [validators.required("Node ID is required.")]],
+  nodeId: [
+    null as number,
+    [validators.required("Node ID is required.")],
+    [isNodeUp],
+  ],
 
   admin: fb.group({
     email: [
@@ -142,19 +149,36 @@ export const mastodon = fb.group({
     port: [null as number, [validators.isPort("Invalid SMTP port.")]],
   }),
 
-  region: [null as string],
+  region: [null as string, [getErrorFromCtx]],
 
-  certified: [false],
+  certified: [false, [getErrorFromCtx]],
 
   tfConnect: [false],
 });
 
 const mnemonics = mastodon.get("mnemonics");
 let unsub: Unsubscriber;
-unsub = mnemonics.subscribe(mn => {
+unsub = mnemonics.subscribe((mn) => {
   if (mn.value.length > 0 && !mnemonics.valid) {
     mnemonics.markAsDirty();
     mnemonics.markAsTouched();
     unsub?.();
-  };
+  }
 });
+
+export function getErrorFromCtx<T extends FCE>(
+  _: FormControl<T>,
+  ctx?: { error: string }
+) {
+  if (ctx?.error) {
+    return { message: ctx.error };
+  }
+}
+
+export async function isNodeUp(ctrl: FormControl<number>) {
+  try {
+    await checkNode(mastodon.get("mnemonics").value, +ctrl.value);
+  } catch {
+    return { message: `Node(${ctrl.value}) is offline.` };
+  }
+}

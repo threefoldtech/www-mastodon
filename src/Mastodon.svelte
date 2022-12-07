@@ -9,7 +9,6 @@
   import {
     generateString,
     deployVM,
-    checkNode,
     getDomainName,
     deployGateway,
     mastodon,
@@ -42,6 +41,15 @@
   let listener: (() => void) | undefined;
   let isUp: boolean = false;
   async function onDeploy() {
+    if (mastodon.valid) {
+      // Revalidate nodeId to verify that node still up
+      await mastodon.get("nodeId").validate();
+
+      // Trigger validation for any fields of selectNodeID
+      // to verify that node still UP
+      mastodon.get("certified").setValue(mastodon$.value.certified.value);
+    }
+
     if (!mastodon.valid) {
       mastodon.markAsDirty();
       mastodon.markAsTouched();
@@ -86,10 +94,6 @@
 
     try {
       events.addListener("logs", (msg: any) => (message = msg));
-
-      message = `Checking the status of Node(${value.nodeId})`;
-      await checkNode(value.mnemonics, value.nodeId);
-      message = `Node(${value.nodeId}) is online`;
 
       const domainName = await getDomainName(value.mnemonics, value.name);
       const [publicNodeId, nodeDomain] = value.gateway.split(":");
@@ -176,7 +180,12 @@
 
   $: v$ = mastodon$.value;
   $: credentialsHasError = isNotValid(v$.mnemonics, v$.sshKey);
-  $: basicHasError = isNotValid(v$.name, v$.admin.value.email);
+  $: basicHasError = isNotValid(
+    v$.name,
+    v$.admin.value.email,
+    v$.region,
+    v$.certified
+  );
   $: advancedHasError = isNotValid(
     v$.cpu,
     v$.memory,
