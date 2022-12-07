@@ -24,7 +24,6 @@
   import MastodonModal from "./components/MastodonModal.svelte";
   import PriceCalculator from "./components/PriceCalculator.svelte";
   import type { FormControlValue } from "tf-svelte-rx-forms/dist/types";
-  import { requiredTrue } from "tf-svelte-rx-forms/dist/validators";
 
   export let provider: string;
 

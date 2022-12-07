@@ -2,7 +2,6 @@ import type { Unsubscriber } from "tf-svelte-rx-forms/dist/internals/rx_store";
 import { getGrid, getBalance } from ".";
 import { generateString } from "./helpers";
 import { isMnemonics, isValidSSH } from "./validators";
-import { get } from "svelte/store"
 
 const { fb, validators } = window.tfSvelteRxForms;
 
@@ -61,7 +60,7 @@ export const mastodon = fb.group({
       validators.isInt("Memory must be a valid integer.", {
         allow_leading_zeroes: false,
       }),
-      validators.min("Minimum allowed memory is 256 MB.", 256),
+      validators.min("Minimum allowed memory is 2048 MB.", 2048),
       validators.max("Maximum allowed memory is 256 GB.", 262144),
     ],
   ],
@@ -72,7 +71,7 @@ export const mastodon = fb.group({
       validators.isInt("Disk must be a valid integer.", {
         allow_leading_zeroes: false,
       }),
-      validators.min("Minimum allowed disk size is 10 GB.", 10),
+      validators.min("Minimum allowed disk size is 20 GB.", 20),
       validators.max("Maximum allowed disk size is 10000 GB.", 10000),
     ],
   ],

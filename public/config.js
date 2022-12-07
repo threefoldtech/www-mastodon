@@ -1,3 +1,3 @@
 window.config = {
-  network: "test",
+  network: "dev",
 };
