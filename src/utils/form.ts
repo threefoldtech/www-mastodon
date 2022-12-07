@@ -2,6 +2,7 @@ import type { FormControl } from "tf-svelte-rx-forms";
 import type { Unsubscriber } from "tf-svelte-rx-forms/dist/internals/rx_store";
 import type { FCE } from "tf-svelte-rx-forms/dist/modules/form_control";
 import { getGrid, getBalance } from ".";
+import { checkNode } from "./deploy";
 import { generateString } from "./helpers";
 import { isMnemonics, isValidSSH } from "./validators";
 
@@ -80,7 +81,11 @@ export const mastodon = fb.group({
   planetary: [true],
   ipv4: [false],
   gateway: [null as string, [validators.required("Gateway is required.")]],
-  nodeId: [null as number, [validators.required("Node ID is required.")]],
+  nodeId: [
+    null as number,
+    [validators.required("Node ID is required.")],
+    [isNodeUp],
+  ],
 
   admin: fb.group({
     email: [
@@ -165,9 +170,15 @@ export function getErrorFromCtx<T extends FCE>(
   _: FormControl<T>,
   ctx?: { error: string }
 ) {
-  console.log({ ctrl: _, ctx });
-
   if (ctx?.error) {
     return { message: ctx.error };
+  }
+}
+
+export async function isNodeUp(ctrl: FormControl<number>) {
+  try {
+    await checkNode(mastodon.get("mnemonics").value, +ctrl.value);
+  } catch {
+    return { message: `Node(${ctrl.value}) is offline.` };
   }
 }

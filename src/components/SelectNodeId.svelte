@@ -3,7 +3,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import type { MastodonForm } from "../Mastodon.svelte";
-  import { findNodes, getErrorFromCtx } from "../utils";
+  import { findNodes, getErrorFromCtx, isNodeUp } from "../utils";
   const { Select } = window.tfSvelteBulmaWc;
   const { fb, FormGroup, validators } = window.tfSvelteRxForms;
   import debounce from "lodash/debounce.js";
@@ -15,10 +15,12 @@
   import type { Networks } from "tfgrid-gql";
 
   export let mastodon: MastodonForm;
-  const controller = fb.control<number>(null, [
-    validators.required("Node ID is required."),
-  ]);
-  const farmId = fb.control<number>(null);
+  const controller = fb.control<number>(
+    null,
+    [getErrorFromCtx, validators.required("Node ID is required.")],
+    [isNodeUp]
+  );
+  const farmId = fb.control<number>(null, [getErrorFromCtx]);
   let nodes: NodeInfo[] = [];
   let farms: { name: string; farmID: number }[] = [];
 
@@ -43,13 +45,27 @@
       const filters = form.value;
       delete filters.region;
       filters.mru /= 1024;
+      delete filters.farmId;
 
       nodes = await findNodes(mastodon.value.mnemonics, filters);
+
+      const farmId = form.get("farmId");
+      if (farmId.value) {
+        nodes = nodes.filter((node) => node.farmId === farmId.value);
+        if (nodes.length === 0) {
+          const error = `No nodes with farmID(${farmId.value}) were found.`;
+          controller.setValue(null, { error });
+          if (farmId.getValue().error !== error) {
+            farmId.setValue(farmId.value, { error });
+          }
+        }
+      }
 
       if (form.get("certified").value) {
         nodes = nodes.filter((node) => node.certificationType === "Certified");
         if (nodes.length === 0) {
           const error = "No certified nodes were found.";
+          controller.setValue(null, { error });
           if (form.get("certified").getValue().error !== error)
             form.get("certified").setValue(true, { error });
         }
@@ -64,6 +80,7 @@
 
         if (nodes.length === 0) {
           const error = `No nodes were found in '${region}' region.`;
+          controller.setValue(null, { error });
           if (form.get("region").getValue().error !== error) {
             form.get("region").setValue(region, { error });
           }
@@ -160,7 +177,6 @@
       })),
     ]}
     controller={farmId}
-    validation={false}
     loading={!farmLoaded}
     disabled={!farmLoaded}
   />
@@ -168,13 +184,14 @@
   <Select
     label="Select Node ID"
     placeholder="Select Node ID to deploy"
-    validation={!loading}
-    {loading}
-    disabled={loading}
+    validation={!loading && !controller$.pending}
+    loading={loading || controller$.pending}
+    disabled={loading || controller$.pending}
     {controller}
     options={nodes.map((node) => ({
       label: `Node ID(${node.nodeId})`,
       value: node.nodeId,
     }))}
+    hint={controller$.pending ? "Checking node status (Up/Down)..." : undefined}
   />
 {/if}
