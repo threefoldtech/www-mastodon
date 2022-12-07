@@ -1,4 +1,4 @@
-<svelte:options tag="tf-app-loader" />
+<svelte:options tag="tf-mastodon-loader" />
 
 <script lang="ts">
   export let total: number;
@@ -17,5 +17,5 @@
   style:justify-content="center"
   style:align-items="center"
 >
-  <p style:text-align="center">{message} | {current}/{total}</p>
+  <p style:text-align="center">{message || "Loading..."} | {current}/{total}</p>
 </div>

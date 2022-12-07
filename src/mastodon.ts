@@ -1,16 +1,20 @@
-// without any split
-// import "grid3_client";
-// import "./Mastodon.svelte";
-import "./components/AppLoader.svelte";
+const globalStyles = document.createElement("style");
+globalStyles.setAttribute("data-global-styles", "");
+globalStyles.appendChild(
+  document.createTextNode(`
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
 
-const appLoader: any = document.createElement("tf-app-loader");
-appLoader.total = 9;
-document.body.append(appLoader);
+  .d-none {
+    display: none !important;
+  }
+`)
+);
+document.head.appendChild(globalStyles);
 
 function download(name: string) {
   const msg = `Downloading ${name}...`;
-  console.log(msg);
-  appLoader.setMessage(msg);
+  (<any>window).loader?.setMessage(msg);
 }
 
 export async function main() {
@@ -41,7 +45,7 @@ export async function main() {
   download("Mastodon List Weblet");
   await import("./MastodonList.svelte");
 
-  appLoader.remove();
+  (<any>window).loader?.remove();
 }
 
 main();

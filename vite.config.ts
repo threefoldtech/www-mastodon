@@ -16,6 +16,10 @@ export default defineConfig({
       ],
       output: {
         entryFileNames: "mastodon.js",
+        dir: "dist/mastodon-weblet/weblet",
+        chunkFileNames(chunkInfo) {
+          return `mastodon-weblet/assets/${chunkInfo.name}.js`;
+        },
       },
     },
   },

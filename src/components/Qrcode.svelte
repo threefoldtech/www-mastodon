@@ -50,7 +50,7 @@
     <div class="has-text-centered">
       {#each downloads as { src, alt, url }, index}
         <img
-          {src}
+          src="mastodon-weblet/{src}"
           width="150"
           {alt}
           class:mr-2={index === 0}
