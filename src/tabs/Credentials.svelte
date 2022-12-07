@@ -89,6 +89,7 @@
         if (value !== "") {
           requestAnimationFrame(() => {
             __ssh = JSON.parse(value).sshkey;
+            __mnemonics = mnemonics$.value;
             mastodon.get("sshKey").setValue(__ssh);
           });
         }
