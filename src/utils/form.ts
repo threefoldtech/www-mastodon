@@ -154,7 +154,6 @@ const mnemonics = mastodon.get("mnemonics");
 let unsub: Unsubscriber;
 unsub = mnemonics.subscribe(mn => {
   if (mn.value.length > 0 && !mnemonics.valid) {
-    console.log("im here", unsub);
     mnemonics.markAsDirty();
     mnemonics.markAsTouched();
     unsub?.();

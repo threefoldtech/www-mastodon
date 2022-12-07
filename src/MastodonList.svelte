@@ -162,7 +162,6 @@
             "name",
             "Public IPv4",
             "Planetary Network IP",
-            "Flist",
             "Billing Rate",
           ]}
           position={false}
@@ -172,7 +171,6 @@
               i.name,
               ip || "None",
               i.planetary,
-              i.flist,
               billingRate[index],
             ];
           })}
