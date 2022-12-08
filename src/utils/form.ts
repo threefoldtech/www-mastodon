@@ -4,7 +4,7 @@ import type { FCE } from "tf-svelte-rx-forms/dist/modules/form_control";
 import { getGrid, getBalance } from ".";
 import { checkNode } from "./deploy";
 import { generateString } from "./helpers";
-import { isMnemonics, isValidSSH } from "./validators";
+import { emailValidator, isMnemonics, isValidSSH } from "./validators";
 
 const { fb, validators } = window.tfSvelteRxForms;
 
@@ -41,6 +41,9 @@ export const mastodon = fb.group({
     generateString(5, "md"),
     [
       validators.required("Mastodon instance's name is required."),
+      validators.isAlphanumeric(
+        "Name can only include alphanumeric characters."
+      ),
       validators.minLength("Name must be at least 2 chars.", 2),
       validators.maxLength("Name maxLength is 15 chars.", 15),
     ],
@@ -97,7 +100,7 @@ export const mastodon = fb.group({
             return { message: "The email is reserved, use different email." };
           }
         },
-        validators.isEmail("Invalid email format.", { require_tld: true }),
+        emailValidator,
       ],
     ],
     username: [
@@ -113,6 +116,10 @@ export const mastodon = fb.group({
             };
           }
         },
+        validators.isAlphanumeric(
+          "Name can only include alphanumeric characters.",
+          { options: { ignore: /_/g } }
+        ),
       ],
     ],
     password: [
@@ -127,14 +134,7 @@ export const mastodon = fb.group({
 
   smtp: fb.group({
     enable: [false],
-    email: [
-      "",
-      [
-        validators.isEmail("Invalid email format.", {
-          require_tld: true,
-        }),
-      ],
-    ],
+    email: ["", [emailValidator]],
     password: [
       generateString(15),
       [
