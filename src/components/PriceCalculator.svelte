@@ -57,26 +57,22 @@
               <b-tags addons align="centered" size="large">
                 <b-tag>
                   {mastodon$.value.mnemonics.valid && !loading
-                    ? "The deployment will cost "
+                    ? index === 0
+                      ? "Based on your specifications, the standard deployment cost is "
+                      : "Because you have 50k TFT in your TF Chain Wallet, your cost is"
                     : ""}
                   <strong class="mr-1 ml-1">
                     {loading ? "Loading..." : p.toFixed(2)}
                   </strong>
-                  {mastodon$.value.mnemonics.valid
-                    ? `USD/Month ${
-                        index === 1 ? "with a 50k balance of TFT, after applying discount" : ""
-                      }`
-                    : ""}
+                  {mastodon$.value.mnemonics.valid ? "USD/Month" : ""}
                 </b-tag>
               </b-tags>
             </div>
           {/each}
         </div>
-        <div class="column" style:display="flex"
-        style:justify-content="end">
+        <div class="column" style:display="flex" style:justify-content="end">
           <Balance />
         </div>
-
       </div>
     {/if}
   {/if}
