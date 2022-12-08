@@ -8,8 +8,9 @@
 
   export let mastodon: MastodonForm;
 
+  let balance: number;
   let price: number;
-  let price50K: number;
+  let price0K: number;
   let loading = true;
 
   $: mastodon$ = $mastodon;
@@ -24,6 +25,9 @@
     __challenge = challenge;
 
     const grid = await getGrid(mnemonics.value);
+
+    balance = await grid.balance.getMyBalance().then((b) => b.free);
+
     price = (
       await grid.calculator.calculateWithMyBalance({
         cru: cpu.value,
@@ -33,13 +37,13 @@
       })
     ).sharedPrice;
 
-    price50K = (
+    price0K = (
       await grid.calculator.calculate({
         cru: cpu.value,
         sru: disk.value + 2,
         mru: memory.value / 1024,
         hru: 0,
-        balance: 50 * 10e3,
+        balance: 0,
       })
     ).sharedPrice;
     loading = false;
@@ -52,19 +56,31 @@
     {#if mastodon$.value.mnemonics.valid}
       <div class="columns is-vcentered" style:margin-bottom="10px">
         <div class="column is-10">
-          {#each [price, price50K] as p, index}
+          {#each [price0K, price] as p, index}
             <div style:margin-bottom={index === 0 ? -5 : undefined}>
               <b-tags addons align="centered" size="large">
                 <b-tag>
-                  {mastodon$.value.mnemonics.valid && !loading
+                  {@html mastodon$.value.mnemonics.valid && !loading
                     ? index === 0
                       ? "Based on your specifications, the standard deployment cost is "
-                      : "Because you have 50k TFT in your TF Chain Wallet, your cost is"
+                      : `Because you have <strong class="mx-1"> ${balance.toFixed(
+                          2
+                        )}</strong> TFT in your TF Chain Wallet, your cost is`
                     : ""}
                   <strong class="mr-1 ml-1">
                     {loading ? "Loading..." : p.toFixed(2)}
                   </strong>
                   {mastodon$.value.mnemonics.valid ? "USD/Month" : ""}
+                  {#if index === 1}
+                    <a
+                      href="https://library.threefold.me/info/threefold#/cloud/threefold__pricing?id=discount-levels"
+                      target="_blank"
+                      rel="noreferrer"
+                      class="ml-1"
+                    >
+                      Learn More</a
+                    >
+                  {/if}
                 </b-tag>
               </b-tags>
             </div>
