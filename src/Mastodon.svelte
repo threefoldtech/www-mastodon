@@ -13,6 +13,7 @@
     deployGateway,
     mastodon,
     listenUntillUp,
+    checkNode,
   } from "./utils";
   import Basic from "./tabs/Basic.svelte";
 
@@ -41,7 +42,12 @@
   let listener: (() => void) | undefined;
   let isUp: boolean = false;
   async function onDeploy() {
-    if (mastodon.valid) {
+    const { value } = mastodon;
+
+    try {
+      // Will throw and error if node currently Down.
+      await checkNode(value.mnemonics, value.nodeId);
+    } catch {
       // Revalidate nodeId to verify that node still up
       await mastodon.get("nodeId").validate();
 
@@ -90,7 +96,6 @@
       listener = undefined;
     }
     isUp = false;
-    const { value } = mastodon;
 
     try {
       events.addListener("logs", (msg: any) => (message = msg));
