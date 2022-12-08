@@ -4,7 +4,7 @@
 import "./components/AppLoader.svelte";
 
 const appLoader: any = document.createElement("tf-app-loader");
-appLoader.total = 9;
+appLoader.total = 10;
 document.body.append(appLoader);
 
 function download(name: string) {
@@ -14,6 +14,9 @@ function download(name: string) {
 }
 
 export async function main() {
+  download("Polkadot Api");
+  window.polkadot_api = await import("@polkadot/api");
+
   download("Grid3 Client");
   await import("grid3_client");
 
