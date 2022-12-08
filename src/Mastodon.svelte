@@ -23,6 +23,8 @@
   import MastodonModal from "./components/MastodonModal.svelte";
   import PriceCalculator from "./components/PriceCalculator.svelte";
   import type { FormControlValue } from "tf-svelte-rx-forms/dist/types";
+  import { onMount } from "svelte";
+  const { Input, btn } = window.tfSvelteBulmaWc;
 
   export let provider: string;
 
@@ -131,7 +133,7 @@
               ]
             : []),
         ],
-        solutionProviderID: provider ? +provider : undefined,
+        solutionProviderID: value.solutionCode,
         metadata: JSON.stringify({
           type: "vm",
           name: mastodon.value.name,
@@ -144,7 +146,7 @@
         mnemonics: value.mnemonics,
         planetaryIp: vm[0]["planetary"] as string,
         publicNodeId: +publicNodeId,
-        solutionProviderID: provider ? +provider : undefined,
+        solutionProviderID: value.solutionCode,
         metadata: JSON.stringify({
           type: "gateway",
           name: domainName,
@@ -207,6 +209,14 @@
           v$.smtp.value.server
         )
       : false);
+
+  let providingSolutionCode = true;
+  onMount(() => {
+    if (typeof provider !== "undefined") {
+      providingSolutionCode = false;
+      mastodon.get("solutionCode").setValue(+provider);
+    }
+  });
 </script>
 
 <b-box>
@@ -220,87 +230,128 @@
       privacy options, and moderation policies.
     </p>
     <PriceCalculator {mastodon} />
+    <hr />
   </b-content>
-  <section class:d-none={deploying} style:margin-top="35px">
-    <Tabs
-      bind:active
-      tabs={[
-        {
-          id: "credentials",
-          label: "Credentials",
-          error: credentialsHasError,
-        },
-        ...(validCredentials
-          ? [
-              { id: "basic", label: "Basic", error: basicHasError },
-              { id: "advanced", label: "Advanced", error: advancedHasError },
-            ]
-          : []),
-      ]}
+  {#if providingSolutionCode}
+    <Input
+      label="Solution Code"
+      sublabel="If you don't have solution code please contact with our support."
+      placeholder="Solution Code"
+      controller={mastodon.get("solutionCode")}
+      validation={!mastodon$.value.solutionCode.pending}
+      loading={mastodon$.value.solutionCode.pending}
     />
-  </section>
-
-  <form on:submit|preventDefault={onDeploy}>
-    <section class:d-none={deploying}>
-      <Credentials {mastodon} show={active === "credentials"} />
-
-      {#if validCredentials}
-        <Basic {mastodon} show={active === "basic"} />
-        <Advanced {mastodon} show={active === "advanced"} />
-      {/if}
-    </section>
-
-    <section class:d-none={!deploying}>
-      <b-notification
-        color={error ? "danger" : success ? "success" : "info"}
-        light
-      >
-        [+] {message || "Loading.."}.
-      </b-notification>
-    </section>
-
-    <div class="is-flex mt-2 is-align-items-center">
-      <div style:width="100%" class="mr-2">
-        {#if listener}
-          <b-notification color="warning" light>
-            <b-icon icon="fas fa-spinner fa-pulse" /> Waiting for your mastodon instance
-            to be up and running...
-          </b-notification>
-        {:else if isUp}
-          <b-notification color="success" light>
-            <b-icon icon="fa-solid fa-circle-check" /> Your mastodon instance is
-            up and running.
-          </b-notification>
-        {/if}
-      </div>
+    <b-btns align="centered">
       <button
         use:btn={{
-          color: deploying ? "info" : "primary",
-          loading: deploying && !error && !success,
+          color: "primary",
+          loading: mastodon$.value.solutionCode.pending,
         }}
-        type={deploying ? "button" : "submit"}
-        disabled={credentialsHasError ||
-          (deploying && !error && !success) ||
-          deployedData ||
-          showDeployedData}
-        on:click={deploying
-          ? (e) => {
-              e.preventDefault();
-              deploying = false;
-              success = false;
-              error = false;
-              isUp = false;
-              if (listener) {
-                listener();
-                listener = undefined;
-              }
-            }
-          : undefined}
+        disabled={!mastodon$.value.solutionCode.valid}
+        on:click={() => (providingSolutionCode = false)}
       >
-        {deploying ? "Back" : "Deploy"}
+        Continue
       </button>
-    </div>
-  </form>
+      <button
+        use:btn={{ color: "info" }}
+        disabled={mastodon$.value.solutionCode.valid ||
+          mastodon$.value.solutionCode.pending}
+        on:click={() => {
+          mastodon.get("solutionCode").setValue(1);
+          providingSolutionCode = false;
+        }}
+      >
+        Don't have Code ?
+      </button>
+    </b-btns>
+  {:else}
+    <section class:d-none={providingSolutionCode}>
+      <section class:d-none={deploying} style:margin-top="35px">
+        <Tabs
+          bind:active
+          tabs={[
+            {
+              id: "credentials",
+              label: "Credentials",
+              error: credentialsHasError,
+            },
+            ...(validCredentials
+              ? [
+                  { id: "basic", label: "Basic", error: basicHasError },
+                  {
+                    id: "advanced",
+                    label: "Advanced",
+                    error: advancedHasError,
+                  },
+                ]
+              : []),
+          ]}
+        />
+      </section>
+
+      <form on:submit|preventDefault={onDeploy}>
+        <section class:d-none={deploying}>
+          <Credentials {mastodon} show={active === "credentials"} />
+
+          {#if validCredentials}
+            <Basic {mastodon} show={active === "basic"} />
+            <Advanced {mastodon} show={active === "advanced"} />
+          {/if}
+        </section>
+
+        <section class:d-none={!deploying}>
+          <b-notification
+            color={error ? "danger" : success ? "success" : "info"}
+            light
+          >
+            [+] {message || "Loading.."}.
+          </b-notification>
+        </section>
+
+        <div class="is-flex mt-2 is-align-items-center">
+          <div style:width="100%" class="mr-2">
+            {#if listener}
+              <b-notification color="warning" light>
+                <b-icon icon="fas fa-spinner fa-pulse" /> Waiting for your mastodon
+                instance to be up and running...
+              </b-notification>
+            {:else if isUp}
+              <b-notification color="success" light>
+                <b-icon icon="fa-solid fa-circle-check" /> Your mastodon instance
+                is up and running.
+              </b-notification>
+            {/if}
+          </div>
+          <button
+            use:btn={{
+              color: deploying ? "info" : "primary",
+              loading: deploying && !error && !success,
+            }}
+            type={deploying ? "button" : "submit"}
+            disabled={credentialsHasError ||
+              (deploying && !error && !success) ||
+              deployedData ||
+              showDeployedData}
+            on:click={deploying
+              ? (e) => {
+                  e.preventDefault();
+                  deploying = false;
+                  success = false;
+                  error = false;
+                  isUp = false;
+                  if (listener) {
+                    listener();
+                    listener = undefined;
+                  }
+                }
+              : undefined}
+          >
+            {deploying ? "Back" : "Deploy"}
+          </button>
+        </div>
+      </form>
+    </section>
+  {/if}
 
   {#if deployedData && showDeployedData}
     <MastodonModal

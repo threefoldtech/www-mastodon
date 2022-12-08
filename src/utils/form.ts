@@ -4,9 +4,16 @@ import type { FCE } from "tf-svelte-rx-forms/dist/modules/form_control";
 import { getGrid, getBalance } from ".";
 import { checkNode } from "./deploy";
 import { generateString } from "./helpers";
-import { emailValidator, isMnemonics, isValidSSH } from "./validators";
+import {
+  emailValidator,
+  isMnemonics,
+  isValidSSH,
+  solutionCodeValidator,
+} from "./validators";
 
 const { fb, validators } = window.tfSvelteRxForms;
+const { GridClient } = window.grid3_client;
+const { HTTPMessageBusClient } = window.tsRmbHttpClient;
 
 export const noBalanceMessage = "Your balance is not enough.";
 export const mastodon = fb.group({
@@ -28,6 +35,14 @@ export const mastodon = fb.group({
         }
       },
     ],
+  ],
+  solutionCode: [
+    null as number,
+    [
+      validators.required("Solution code is required."),
+      validators.isInt("Solution code must be a valid integer."),
+    ],
+    [solutionCodeValidator],
   ],
   sshKey: [
     "",

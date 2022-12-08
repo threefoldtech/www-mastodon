@@ -9,6 +9,7 @@ import type * as webSshKeygen from "web-ssh-keygen";
 import type * as tfgridGql from "tfgrid-gql";
 import type qrcode from "qrcode";
 import type MastodonList from "./MastodonList.svelte";
+import type * as polkadot_api from "@polkadot/api";
 
 declare global {
   interface Window {
@@ -20,6 +21,7 @@ declare global {
     tfgridGql: typeof tfgridGql;
     qrcode: typeof qrcode;
     mastodonList?: MastodonList;
+    polkadot_api: typeof polkadot_api;
 
     config: {
       network: string;
