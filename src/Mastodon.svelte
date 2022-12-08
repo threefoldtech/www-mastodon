@@ -73,7 +73,10 @@
             else if (!v$.memory.valid) mastodon.get("memory")["__input"]?.focus();
             else if (!v$.disk.valid) mastodon.get("disk")["__input"]?.focus();
             else if (!v$.admin.value.username.valid) mastodon.get("admin").get("username")["__input"]?.focus();
-            else if (!v$.admin.value.password.valid) mastodon.get("admin").get("password")["__input"]?.focus();
+            else if (!v$.smtp.value.email.valid) mastodon.get("smtp").get("email")["__input"]?.focus();
+            else if (!v$.smtp.value.password.valid) mastodon.get("smtp").get("password")["__input"]?.focus();
+            else if (!v$.smtp.value.server.valid) mastodon.get("smtp").get("server")["__input"]?.focus();
+            else if (!v$.smtp.value.port.valid) mastodon.get("smtp").get("port")["__input"]?.focus();
           });
           });
         }
@@ -186,15 +189,24 @@
     v$.region,
     v$.certified
   );
-  $: advancedHasError = isNotValid(
-    v$.cpu,
-    v$.memory,
-    v$.disk,
-    v$.gateway,
-    v$.nodeId,
-    v$.admin.value.username,
-    v$.admin.value.password
-  );
+  $: advancedHasError =
+    isNotValid(
+      v$.cpu,
+      v$.memory,
+      v$.disk,
+      v$.gateway,
+      v$.nodeId,
+      v$.admin.value.username,
+      v$.admin.value.password
+    ) ||
+    (v$.smtp.value.enable.value
+      ? isNotValid(
+          v$.smtp.value.email,
+          v$.smtp.value.password,
+          v$.smtp.value.port,
+          v$.smtp.value.server
+        )
+      : false);
 </script>
 
 <b-box>
