@@ -38,15 +38,21 @@
 
   >
     <p>
-      Balance: <span style="font-weight: bold;"
+      Balance: <span style:font-weight="bold"
         >{free.toFixed(3) + " TFT"}</span
       >
     </p>
-    <p>
-      Locked: <span style="font-weight: bold;"
-        >{locked.toFixed(3) + " TFT"}</span
+    <a style:color="#000" href="https://library.threefold.me/info/manual/#/manual__tfchain_home?id=contract-grace-period" target="_blank" rel="noreferrer">
+      <b-tooltip
+        flow="left"
+        tooltip="Click to read about locked balance."
       >
-    </p>
+        Locked:
+      </b-tooltip>
+    </a>
+    <span style:font-weight="bold">
+      {locked.toFixed(3) + " TFT"}
+    </span>
     <button
       class="btn"
       style:border="none"
