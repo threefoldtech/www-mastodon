@@ -103,12 +103,17 @@
 
   let selected: number[] = [];
   let deleting = false;
+  let disableReload = false;
   let deletingIndex: number;
   let table: Table;
 
   export function reload() {
     listMastodon();
-  }
+  };
+
+  export function setDisabled(value: boolean) {
+    disableReload = value;
+  };
 </script>
 
 <b-box>
@@ -120,7 +125,7 @@
           <button
             class:mr-2={true}
             use:btn={{ color: "primary", loading, size: "small" }}
-            disabled={loading || deleting || !mnemonics$.valid}
+            disabled={loading || deleting || !mnemonics$.valid || disableReload}
             on:click={listMastodon}
           >
             <b-icon icon="fa-solid fa-arrows-rotate" />

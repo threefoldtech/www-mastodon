@@ -94,6 +94,7 @@
     }
 
     deploying = true;
+    window.mastodonList?.setDisabled(true);
     error = false;
     success = false;
     if (listener) {
@@ -167,6 +168,7 @@
       listener = done;
       up.then(() => {
         window.mastodonList?.reload();
+        window.mastodonList?.setDisabled(false);
         isUp = true;
         listener = undefined;
         showDeployedData = true;
