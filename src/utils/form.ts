@@ -25,7 +25,21 @@ export const mastodon = fb.group({
         try {
           await getGrid(ctrl.value);
         } catch {
-          return { message: "Couldn't load grid using these mnemonic." };
+          return { message: `
+          <strong>
+            Couldn't load grid using these mnemonic.
+          </strong>
+          <p>
+            Read more about how to activate an account using our 
+              <a
+                href="https://library.threefold.me/info/manual/#/getstarted/manual__dashboard_portal_polkadot_create_account"
+                target="_blank">
+                manual
+              </a>
+          </p>
+          </br>
+          `
+        };
         }
       },
       async (ctrl) => {
