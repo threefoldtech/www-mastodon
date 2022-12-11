@@ -83,7 +83,7 @@
         tooltip="Mastodon does not require an SMTP server. If you want to use an SMTP server, you can configure it."
       >
         <CheckBox
-          label="SMTP Server"
+          label="<strong>SMTP Server</strong>"
           controller={mastodon.get("smtp").get("enable")}
         />
       </b-tooltip>

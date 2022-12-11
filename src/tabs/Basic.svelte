@@ -44,20 +44,23 @@
     <b-tooltip
       class:is-block={true}
       class:mb-2={true}
-      tooltip="Enable ThreeFold Connect on your Mastodon instance."
+      tooltip="Users of your instance will be required to log in with ThreeFold Connect to enable another level of security and authenticity."
       flow="right"
     >
       <CheckBox
-        label="Enable ThreeFold Connect"
+        label="<strong>Enable<a href='https://library.threefold.me/info/threefold/#/tokens/threefold__threefold_connect' target='_blank' class='ml-1'>ThreeFold Connect</a></strong>"
         controller={mastodon.get("tfConnect")}
       />
     </b-tooltip>
 
     <b-tooltip
-      tooltip="Deploys your instance on a Certified Threefold Node."
+      tooltip="Deploy your instance on a Certified 3Node. Certified 3Nodes come with greater levels of security and performance along with other benefits."
       flow="right"
     >
-      <CheckBox label="Certified" controller={mastodon.get("certified")} />
+      <CheckBox
+        label="<strong><a href='https://library.threefold.me/info/threefold/#/tfgrid/pricing/threefold__certified_farming' target='_blank' class='mr-1'>Certified</a>Hardware</strong>"
+        controller={mastodon.get("certified")}
+      />
     </b-tooltip>
   </section>
 {/if}
