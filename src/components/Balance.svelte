@@ -42,7 +42,7 @@
         >{free.toFixed(3) + " TFT"}</span
       >
     </p>
-    <a style:color="#000" href="https://library.threefold.me/info/manual/#/manual__tfchain_home?id=contract-grace-period" target="_blank" rel="noreferrer">
+    <a href="https://library.threefold.me/info/manual/#/manual__tfchain_home?id=contract-grace-period" target="_blank" rel="noreferrer">
       <b-tooltip
         flow="left"
         tooltip="Click to read about locked balance."
