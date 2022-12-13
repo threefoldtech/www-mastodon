@@ -12,7 +12,7 @@
 
 <div
   style:height="100vh"
-  style:width="100vw"
+  style:width="100%"
   style:display="flex"
   style:justify-content="center"
   style:align-items="center"

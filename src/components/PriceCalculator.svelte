@@ -54,7 +54,44 @@
 <div>
   {#if mastodon}
     {#if mastodon$.value.mnemonics.valid}
-      <div class="columns is-vcentered" style:margin-bottom="10px">
+      <div class="is-flex">
+        <b-box
+          style:width="100%"
+          style:background-color="var(--main-purple)"
+          class:has-text-white={true}
+          class:mb-0={true}
+          class:mr-2={true}
+          class:is-flex={true}
+          class:is-align-items-center={true}
+        >
+          <div>
+            {#if loading}
+              <strong>Loading...</strong>
+            {:else if typeof price0K == "number" && typeof price == "number"}
+              Based on your specifications, the standard deployment cost is <strong
+                >{price0K}</strong
+              >
+              USD/month.<br /> Because you have <strong>{balance}</strong> TFT
+              in your TF Chain Wallet, your cost is <strong>{price}</strong>
+              USD/month.
+              <strong>
+                <a
+                  href="https://library.threefold.me/info/threefold#/cloud/threefold__pricing?id=discount-levels"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="has-text-white is-underlined"
+                >
+                  Learn more</a
+                >
+              </strong>.
+            {:else}
+              Failed to load the required data.
+            {/if}
+          </div>
+        </b-box>
+        <Balance />
+      </div>
+      <!-- <div class="columns is-vcentered" style:margin-bottom="10px">
         <div class="column is-10">
           {#each [price0K, price] as p, index}
             <div style:margin-bottom={index === 0 ? -5 : undefined}>
@@ -89,7 +126,7 @@
         <div class="column" style:display="flex" style:justify-content="end">
           <Balance />
         </div>
-      </div>
+      </div> -->
     {/if}
   {/if}
 </div>

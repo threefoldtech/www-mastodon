@@ -8,13 +8,22 @@
     <style data-global-styles>
       @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
       @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
+      @import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap");
 
       .d-none {
         display: none !important;
       }
+
+      :host {
+        --main-purple: #6261fb;
+      }
+
+      strong {
+        color: inherit !important;
+      }
     </style>
   </head>
-  <body>
+  <body class="container">
     <tf-mastodon provider="1"></tf-mastodon>
     <br />
     <tf-mastodon-list></tf-mastodon-list>
