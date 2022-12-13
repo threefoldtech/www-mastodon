@@ -116,7 +116,7 @@
   }
 </script>
 
-<b-box style:font-family="'Lato', sans-serif">
+<b-box class:p-6={true} style:font-family="'Lato', sans-serif">
   <b-content>
     <div class="is-flex is-justify-content-space-between is-align-items-center">
       <h2>Deployment List (Mastodon)</h2>

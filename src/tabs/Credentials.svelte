@@ -178,9 +178,13 @@
     for (const child of self.children) {
       const btn = child.querySelector("button");
       const inp = child.querySelector("input") || child.querySelector("textarea");
-      const y = inp.getBoundingClientRect().top - child.getBoundingClientRect().top
-      if (btn && inp) {
-        btn.style.marginTop = `${y}px`;
+      try {
+        const y = inp.getBoundingClientRect().top - child.getBoundingClientRect().top
+        if (btn && inp) {
+          btn.style.marginTop = `${y}px`;
+        }
+      } catch {
+        requestAnimationFrame(updateBtnsMargin);
       }
     }
   }
@@ -214,7 +218,7 @@
       class:ml-2={true}
       style:margin-top="78px"
       use:btn={{
-        color: "info",
+        color: "primary",
         size: "small",
         loading: pending || creating,
       }}
@@ -264,7 +268,7 @@
       class:ml-2={true}
       style:margin-top="78px"
       use:btn={{
-        color: "info",
+        color: "primary",
         size: "small",
         loading: readingSSH || generatingSSH || storingSSH,
       }}
