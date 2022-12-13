@@ -228,6 +228,7 @@
 
 <b-box
   class:p-6={true}
+  class:mt-3={true}
   class:is-size-5={true}
   style:font-family="'Lato', sans-serif"
 >
