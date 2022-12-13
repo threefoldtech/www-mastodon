@@ -8,7 +8,7 @@
 
   export let mastodon: MastodonForm;
 
-  let balance: number;
+  let balance: string;
   let price: number;
   let price0K: number;
   let loading = true;
@@ -26,7 +26,7 @@
 
     const grid = await getGrid(mnemonics.value);
 
-    balance = await grid.balance.getMyBalance().then((b) => b.free);
+    balance = await grid.balance.getMyBalance().then((b) => b.free.toFixed(2));
 
     price = (
       await grid.calculator.calculateWithMyBalance({
@@ -54,7 +54,49 @@
 <div>
   {#if mastodon}
     {#if mastodon$.value.mnemonics.valid}
-      <div class="columns is-vcentered" style:margin-bottom="10px">
+      <div class="is-flex-desktop">
+        <div class="is-flex" style:width="100%">
+          <b-box
+            style:width="100%"
+            style:background-color="var(--main-purple)"
+            class:has-text-white={true}
+            class:mb-2={true}
+            class:is-flex={true}
+            class:is-align-items-center={true}
+          >
+            <div>
+              {#if loading}
+                <strong>Loading...</strong>
+              {:else if typeof price0K == "number" && typeof price == "number"}
+                <div style:line-height="45px">
+                  Based on your specifications, the standard deployment cost is <strong
+                    >{price0K}</strong
+                  >
+                  USD/month.<br /> Because you have <strong>{balance}</strong>
+                  TFT in your TF Chain Wallet, your cost is
+                  <strong>{price}</strong>
+                  USD/month.
+                  <strong>
+                    <a
+                      href="https://library.threefold.me/info/threefold#/cloud/threefold__pricing?id=discount-levels"
+                      target="_blank"
+                      rel="noreferrer"
+                      class="has-text-white is-underlined"
+                    >
+                      Learn more</a
+                    >
+                  </strong>.
+                </div>
+              {:else}
+                Failed to load the required data.
+              {/if}
+            </div>
+          </b-box>
+        </div>
+        <div style:width="1.25rem" class="is-hidden-touch" />
+        <Balance />
+      </div>
+      <!-- <div class="columns is-vcentered" style:margin-bottom="10px">
         <div class="column is-10">
           {#each [price0K, price] as p, index}
             <div style:margin-bottom={index === 0 ? -5 : undefined}>
@@ -89,7 +131,7 @@
         <div class="column" style:display="flex" style:justify-content="end">
           <Balance />
         </div>
-      </div>
+      </div> -->
     {/if}
   {/if}
 </div>

@@ -226,9 +226,15 @@
   });
 </script>
 
-<b-box>
+<b-box
+  class:p-6={true}
+  class:is-size-5={true}
+  style:font-family="'Lato', sans-serif"
+>
   <b-content>
-    <h2>Deploy a Mastodon Instance</h2>
+    <h2 class="has-text-centered is-size-1 mt-0 ">
+      Deploy a Mastodon Instance
+    </h2>
     <p>
       Mastodon is free and open-source software for running self-hosted social
       networking services. It has microblogging features similar to the Twitter
@@ -296,7 +302,7 @@
         />
       </section>
 
-      <form on:submit|preventDefault={onDeploy}>
+      <form on:submit|preventDefault={onDeploy} class="p-2">
         <section class:d-none={deploying}>
           <Credentials {mastodon} show={active === "credentials"} />
 
@@ -316,24 +322,12 @@
         </section>
 
         <div class="is-flex mt-2 is-align-items-center">
-          <div style:width="100%" class="mr-2">
-            {#if listener}
-              <b-notification color="warning" light>
-                <b-icon icon="fas fa-spinner fa-pulse" /> Waiting for your mastodon
-                instance to be up and running...
-              </b-notification>
-            {:else if isUp}
-              <b-notification color="success" light>
-                <b-icon icon="fa-solid fa-circle-check" /> Your mastodon instance
-                is up and running.
-              </b-notification>
-            {/if}
-          </div>
           <button
             use:btn={{
               color: deploying ? "info" : "primary",
               loading: deploying && !error && !success,
             }}
+            class:py-0={true}
             type={deploying ? "button" : "submit"}
             disabled={credentialsHasError ||
               (deploying && !error && !success) ||
@@ -355,6 +349,19 @@
           >
             {deploying ? "Back" : "Deploy"}
           </button>
+          <div style:width="100%" class="ml-2">
+            {#if listener}
+              <b-notification color="warning" light>
+                <b-icon icon="fas fa-spinner fa-pulse" /> Waiting for your mastodon
+                instance to be up and running...
+              </b-notification>
+            {:else if isUp}
+              <b-notification color="success" light>
+                <b-icon icon="fa-solid fa-circle-check" /> Your mastodon instance
+                is up and running.
+              </b-notification>
+            {/if}
+          </div>
         </div>
       </form>
     </section>

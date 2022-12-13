@@ -2,82 +2,76 @@
 
 <script lang="ts">
   import { getBalance, mastodon } from "../utils";
-
-  let free: number;
-  let locked: number;
+  const { btn } = window.tfSvelteBulmaWc;
 
   const mnemonics = mastodon.get("mnemonics");
+  let loading = false;
+  let balance: { free: string; locked: string };
+
+  $: mnemonics$ = $mnemonics;
 
   let __mnemonics: string;
-  $: mnemonics$ = $mnemonics;
   $: if (mnemonics$.valid && __mnemonics !== mnemonics$.value) {
     __mnemonics = mnemonics$.value;
-    getBalance(mnemonics$.value).then((balance) => {
-      free = balance.free;
-      locked = balance.feeFrozen;
-    });
-  } else if (!mnemonics$.valid) {
-    free = undefined;
-    locked = undefined;
+    loadBalance();
   }
 
-  async function refreshBalance() {
-    getBalance(mnemonics$.value).then((balance) => {
-      free = balance.free;
-      locked = balance.feeFrozen;
-    });
+  async function loadBalance() {
+    loading = true;
+    getBalance(mnemonics$.value)
+      .then(({ free, feeFrozen }) => {
+        balance = { free: free.toFixed(2), locked: feeFrozen.toFixed(2) };
+      })
+      .finally(() => {
+        loading = false;
+      });
   }
 </script>
 
-{#if free != undefined && locked != undefined}
-  <div
-    class="card"
-    style:padding="10px"
-    style:background="rgb(245 245 245)"
-    style:text-align="center"
-
-  >
+<b-box
+  style:border="1px solid var(--main-purple)"
+  style:background-color="transparent"
+  style:box-shadow="none"
+  class:is-flex={true}
+  class:is-flex-direction-column={true}
+  class:mb-2={true}
+>
+  {#if loading}
     <p>
-      Balance: <span style:font-weight="bold"
-        >{free.toFixed(3) + " TFT"}</span
-      >
+      <strog>Loading...</strog>
     </p>
-    <a href="https://library.threefold.me/info/manual/#/manual__tfchain_home?id=contract-grace-period" target="_blank" rel="noreferrer">
-      <b-tooltip
-        flow="left"
-        tooltip="Click to read about locked balance."
-      >
-        Locked:
-      </b-tooltip>
-    </a>
-    <span style:font-weight="bold">
-      {locked.toFixed(3) + " TFT"}
-    </span>
+  {:else if balance}
+    <p style:white-space="nowrap" class="mb-1">
+      Balance: <strong>{balance.free} TFT</strong>
+    </p>
+    <p style:white-space="nowrap">
+      <strong>
+        <a
+          href="https://library.threefold.me/info/manual/#/manual__tfchain_home?id=contract-grace-period"
+          target="_blank"
+          rel="noreferrer"
+          class="is-underlined"
+        >
+          Locked
+        </a>
+      </strong>: <strong>{balance.locked} TFT</strong>
+    </p>
+  {:else}
+    <p>Couldn't Load balance.</p>
+  {/if}
+  <div class="is-flex" style:margin-top="auto">
     <button
-      class="btn"
-      style:border="none"
-      style:background="rgb(0 0 0 / 0%)"
-      style:width="100%"
-      style:outline="none"
-      style:cursor="pointer"
-      on:click={refreshBalance}
+      use:btn={{
+        color: "primary",
+        outlined: true,
+        fullwidth: true,
+        loading,
+      }}
+      disabled={loading}
+      class:py-0={true}
+      on:click={loadBalance}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        fill="currentColor"
-        class="bi bi-arrow-clockwise"
-        viewBox="0 0 16 16"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"
-        />
-        <path
-          d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"
-        />
-      </svg>
+      <b-icon icon="fa-solid fa-rotate-right">Reload</b-icon>
     </button>
   </div>
-{/if}
+</b-box>
