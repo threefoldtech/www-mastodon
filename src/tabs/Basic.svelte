@@ -39,6 +39,7 @@
         controller={mastodon.get("tfConnect")}
       />
       <b-tooltip
+        class:is-hidden-touch={true}
         class:is-block={true}
         class:mb-2={true}
         tooltip="Users of your instance will be required to log in with ThreeFold Connect to enable another level of security and authenticity."
@@ -56,6 +57,7 @@
         controller={mastodon.get("certified")}
       />
       <b-tooltip
+        class:is-hidden-touch={true}
         tooltip="Deploy your instance on a Certified 3Node. Certified 3Nodes come with greater levels of security and performance along with other benefits."
         flow="right"
       >

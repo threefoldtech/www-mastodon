@@ -322,24 +322,12 @@
         </section>
 
         <div class="is-flex mt-2 is-align-items-center">
-          <div style:width="100%" class="mr-2">
-            {#if listener}
-              <b-notification color="warning" light>
-                <b-icon icon="fas fa-spinner fa-pulse" /> Waiting for your mastodon
-                instance to be up and running...
-              </b-notification>
-            {:else if isUp}
-              <b-notification color="success" light>
-                <b-icon icon="fa-solid fa-circle-check" /> Your mastodon instance
-                is up and running.
-              </b-notification>
-            {/if}
-          </div>
           <button
             use:btn={{
               color: deploying ? "info" : "primary",
               loading: deploying && !error && !success,
             }}
+            class:py-0={true}
             type={deploying ? "button" : "submit"}
             disabled={credentialsHasError ||
               (deploying && !error && !success) ||
@@ -361,6 +349,19 @@
           >
             {deploying ? "Back" : "Deploy"}
           </button>
+          <div style:width="100%" class="ml-2">
+            {#if listener}
+              <b-notification color="warning" light>
+                <b-icon icon="fas fa-spinner fa-pulse" /> Waiting for your mastodon
+                instance to be up and running...
+              </b-notification>
+            {:else if isUp}
+              <b-notification color="success" light>
+                <b-icon icon="fa-solid fa-circle-check" /> Your mastodon instance
+                is up and running.
+              </b-notification>
+            {/if}
+          </div>
         </div>
       </form>
     </section>

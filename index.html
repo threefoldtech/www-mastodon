@@ -18,6 +18,7 @@
         --main-purple: #6261fb;
         --main-purple-darken: #4747f0;
         --main-purple-lighten: #9c9cf0;
+        --main-purple-lighten-2: #efeef0;
       }
 
       strong {
@@ -68,6 +69,19 @@
 
       .icon-text.has-text-success {
         color: var(--main-purple) !important;
+      }
+
+      .switch__input:checked + .slider {
+        background-color: var(--main-purple);
+      }
+
+      .notification.is-success.is-light {
+        background-color: var(--main-purple-lighten-2);
+        color: var(--main-purple);
+      }
+
+      .button.is-primary[disabled] {
+        background-color: var(--main-purple);
       }
     </style>
   </head>

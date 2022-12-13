@@ -109,14 +109,14 @@
 
   export function reload() {
     listMastodon();
-  };
+  }
 
   export function setDisabled(value: boolean) {
     disableReload = value;
-  };
+  }
 </script>
 
-<b-box>
+<b-box style:font-family="'Lato', sans-serif">
   <b-content>
     <div class="is-flex is-justify-content-space-between is-align-items-center">
       <h2>Deployment List (Mastodon)</h2>

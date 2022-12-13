@@ -8,7 +8,7 @@
 
   export let mastodon: MastodonForm;
 
-  let balance: number;
+  let balance: string;
   let price: number;
   let price0K: number;
   let loading = true;
@@ -26,7 +26,7 @@
 
     const grid = await getGrid(mnemonics.value);
 
-    balance = await grid.balance.getMyBalance().then((b) => b.free);
+    balance = await grid.balance.getMyBalance().then((b) => b.free.toFixed(2));
 
     price = (
       await grid.calculator.calculateWithMyBalance({

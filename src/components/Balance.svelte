@@ -6,7 +6,7 @@
 
   const mnemonics = mastodon.get("mnemonics");
   let loading = false;
-  let balance: { free: number; locked: number };
+  let balance: { free: string; locked: string };
 
   $: mnemonics$ = $mnemonics;
 
@@ -20,7 +20,7 @@
     loading = true;
     getBalance(mnemonics$.value)
       .then(({ free, feeFrozen }) => {
-        balance = { free, locked: feeFrozen };
+        balance = { free: free.toFixed(2), locked: feeFrozen.toFixed(2) };
       })
       .finally(() => {
         loading = false;
