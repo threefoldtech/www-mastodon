@@ -1,19 +1,17 @@
 <svelte:options tag="tf-credentials-tab" />
 
 <script lang="ts">
-  import type { MastodonForm } from "../Mastodon.svelte";
   import { getGrid, noBalanceMessage, Session } from "../utils";
   import Qrcode from "../components/Qrcode.svelte";
   import type { NetworkEnv } from "grid3_client";
-  
+  import { onDestroy, onMount } from "svelte";
+  import { mastodon } from "../utils";
+
   export let show: boolean;
-  export let mastodon: MastodonForm;
-  // export let loadSSH: boolean;
 
   const { Input, btn } = window.tfSvelteBulmaWc;
   const { HTTPMessageBusClient } = window.tsRmbHttpClient;
   const { generateKeyPair } = window.webSshKeygen;
-
 
   let __init = false;
   $: if (mastodon) {
@@ -167,93 +165,117 @@
     ? mnemonics$.valid ||
       (!mnemonics$.valid && mnemonics$.error === noBalanceMessage)
     : false;
+
+  let self: HTMLElement;
+  window.onresize = updateBtnsMargin;
+  onMount(updateBtnsMargin);
+  onDestroy(() => {
+    window.onresize = null;
+  });
+
+  function updateBtnsMargin() {
+    // prettier-ignore
+    for (const child of self.children) {
+      const btn = child.querySelector("button");
+      const inp = child.querySelector("input") || child.querySelector("textarea");
+      const y = inp.getBoundingClientRect().top - child.getBoundingClientRect().top
+      if (btn && inp) {
+        btn.style.marginTop = `${y}px`;
+      }
+    }
+  }
 </script>
 
-{#if mastodon}
-  <section style:display={show ? "initial" : "none"}>
-    <div class="is-flex is-jutify-content-center">
-      <div style:width="100%">
-        <Input
-          label="Mnemonics"
-          placeholder="Mnemonics"
-          sublabel="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
-          type="password"
-          controller={mastodon.get("mnemonics")}
-          disabled={pending || creating}
-          validation={!(pending || creating)}
-          hint={mnemonics$.pending
-            ? "Validating mnemonics..."
-            : accountCreationStatus === "Error"
-            ? creationMsg
-            : undefined}
-          hintColor={mnemonics$.pending
-            ? "info"
-            : accountCreationStatus === "Error"
-            ? "danger"
-            : undefined}
-        />
-      </div>
-      <button
-        type="button"
-        class:ml-2={true}
-        style:margin-top="78px"
-        use:btn={{
-          color: "info",
-          size: "small",
-          loading: pending || creating,
-        }}
-        on:click={onCreateAccount}
-        disabled={mnemonics$.valid || pending || creating}
-      >
-        Create Account
-      </button>
+<section style:display={show ? "initial" : "none"} bind:this={self}>
+  <div class="is-flex is-jutify-content-center">
+    <div style:width="100%">
+      <Input
+        label="Mnemonics"
+        placeholder="Mnemonics"
+        sublabel="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
+        type="password"
+        controller={mastodon.get("mnemonics")}
+        disabled={pending || creating}
+        validation={!(pending || creating)}
+        hint={mnemonics$.pending
+          ? "Validating mnemonics..."
+          : accountCreationStatus === "Error"
+          ? creationMsg
+          : undefined}
+        hintColor={mnemonics$.pending
+          ? "info"
+          : accountCreationStatus === "Error"
+          ? "danger"
+          : undefined}
+      />
     </div>
-    {#if accountCreationStatus === "Done" && creationMsg}
-      <b-notification color="warning" light class:my-2={true}>
-        <b-icon icon="fa-sharp fa-solid fa-triangle-exclamation" />
-        {creationMsg}
-      </b-notification>
-    {/if}
+    <button
+      type="button"
+      class:ml-2={true}
+      style:margin-top="78px"
+      use:btn={{
+        color: "info",
+        size: "small",
+        loading: pending || creating,
+      }}
+      on:click={onCreateAccount}
+      disabled={mnemonics$.valid || pending || creating}
+    >
+      Create Account
+    </button>
+  </div>
+  {#if accountCreationStatus === "Done" && creationMsg}
+    <b-notification color="warning" light class:my-2={true}>
+      <b-icon icon="fa-sharp fa-solid fa-triangle-exclamation" />
+      {creationMsg}
+    </b-notification>
+  {/if}
 
-    {#if (mnemonics$.valid || (!mnemonics$.valid && mnemonics$.error === noBalanceMessage)) && twinId}
-      <Qrcode data="TFT:{bridge}?message=twin_{twinId}&sender=me&amount=100" />
-    {/if}
+  {#if (mnemonics$.valid || (!mnemonics$.valid && mnemonics$.error === noBalanceMessage)) && twinId}
+    <Qrcode data="TFT:{bridge}?message=twin_{twinId}&sender=me&amount=100" />
+  {/if}
 
-    <div class="is-flex is-jutify-content-center mb-2">
-      <div style:width="100%">
-        <Input
-          label="Public SSH Key"
-          type="textarea"
-          placeholder="Your public SSH Key"
-          sublabel="SSH Keys are used to authenticate you to the Mastodon instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-          controller={mastodon.get("sshKey")}
-          loading={readingSSH || generatingSSH || storingSSH}
-          disabled={!mnemonics$.valid || readingSSH || generatingSSH || storingSSH}
-          hint={sshMessage ||
-            (readingSSH || generatingSSH || storingSSH
-              ? sshInfoMessage
-              : undefined)}
-          validation={!(readingSSH || generatingSSH || storingSSH)}
-          hintColor={readingSSH || generatingSSH || storingSSH
-            ? "info"
-            : undefined}
-        />
-      </div>
-
-      <button
-        type="button"
-        class:ml-2={true}
-        style:margin-top="78px"
-        use:btn={{
-          color: "info",
-          size: "small",
-          loading: readingSSH || generatingSSH || storingSSH,
-        }}
-        on:click={onGenerateSSH}
-        disabled={!mnemonics$.valid || readingSSH || generatingSSH || storingSSH || sshKey$.valid}
-      >
-        Generate SSH Key
-      </button>
+  <div class="is-flex is-jutify-content-center mb-2">
+    <div style:width="100%">
+      <Input
+        label="Public SSH Key"
+        type="textarea"
+        placeholder="Your public SSH Key"
+        sublabel="SSH Keys are used to authenticate you to the Mastodon instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
+        controller={mastodon.get("sshKey")}
+        loading={readingSSH || generatingSSH || storingSSH}
+        disabled={!mnemonics$.valid ||
+          readingSSH ||
+          generatingSSH ||
+          storingSSH}
+        hint={sshMessage ||
+          (readingSSH || generatingSSH || storingSSH
+            ? sshInfoMessage
+            : undefined)}
+        validation={!(readingSSH || generatingSSH || storingSSH)}
+        hintColor={readingSSH || generatingSSH || storingSSH
+          ? "info"
+          : undefined}
+      />
     </div>
-  </section>
-{/if}
+
+    <button
+      type="button"
+      class:ml-2={true}
+      style:margin-top="78px"
+      use:btn={{
+        color: "info",
+        size: "small",
+        loading: readingSSH || generatingSSH || storingSSH,
+      }}
+      on:click={onGenerateSSH}
+      disabled={!mnemonics$.valid ||
+        readingSSH ||
+        generatingSSH ||
+        storingSSH ||
+        sshKey$.valid}
+    >
+      Generate SSH Key
+    </button>
+  </div>
+</section>
