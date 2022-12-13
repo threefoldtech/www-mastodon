@@ -16,10 +16,47 @@
 
       :host {
         --main-purple: #6261fb;
+        --main-purple-darken: #4747f0;
+        --main-purple-lighten: #9c9cf0;
       }
 
       strong {
         color: inherit !important;
+      }
+
+      .button.is-primary {
+        background-color: var(--main-purple);
+      }
+
+      .button.is-primary:hover {
+        background-color: var(--main-purple-darken);
+      }
+
+      .button.is-primary.is-outlined {
+        border-color: var(--main-purple);
+        color: var(--main-purple);
+      }
+
+      .button.is-primary.is-outlined:hover,
+      .button.is-primary.is-outlined:active,
+      .button.is-primary.is-outlined:focus {
+        color: #fff;
+        background-color: var(--main-purple);
+        border-color: transparent;
+      }
+
+      .button.is-primary.is-outlined:active,
+      .button.is-primary.is-outlined:focus {
+        box-shadow: 0 0 0 2px var(--main-purple-lighten);
+      }
+
+      .button.is-primary.is-outlined[disabled] {
+        border-color: var(--main-purple);
+      }
+
+      .button.is-primary.is-outlined.is-loading::after {
+        border-color: transparent transparent var(--main-purple)
+          var(--main-purple) !important;
       }
     </style>
   </head>
