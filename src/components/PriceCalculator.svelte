@@ -9,7 +9,6 @@
   export let mastodon: MastodonForm;
 
   let balance: string;
-  let price: number;
   let price0K: number;
   let loading = true;
 
@@ -27,15 +26,6 @@
     const grid = await getGrid(mnemonics.value);
 
     balance = await grid.balance.getMyBalance().then((b) => b.free.toFixed(2));
-
-    price = (
-      await grid.calculator.calculateWithMyBalance({
-        cru: cpu.value,
-        sru: disk.value + 2,
-        mru: memory.value / 1024,
-        hru: 0,
-      })
-    ).sharedPrice;
 
     price0K = (
       await grid.calculator.calculate({
@@ -65,73 +55,33 @@
             class:is-align-items-center={true}
           >
             <div>
-              {#if loading}
-                <strong>Loading...</strong>
-              {:else if typeof price0K == "number" && typeof price == "number"}
-                <div style:line-height="45px">
-                  Based on your specifications, the standard deployment cost is <strong
-                    >{price0K}</strong
+              <div style:line-height="45px">
+                Based on your specifications and TFChain TFT balance, your
+                deployment cost is <strong
+                  >{loading
+                    ? "Calculating..."
+                    : price0K
+                    ? price0K
+                    : "Failed to calculate standard price"}</strong
+                >
+                USD/Month.<br />
+                <strong>
+                  <a
+                    href="https://library.threefold.me/info/threefold#/cloud/threefold__pricing?id=discount-levels"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="has-text-white is-underlined"
                   >
-                  USD/month.<br /> Because you have <strong>{balance}</strong>
-                  TFT in your TF Chain Wallet, your cost is
-                  <strong>{price}</strong>
-                  USD/month.
-                  <strong>
-                    <a
-                      href="https://library.threefold.me/info/threefold#/cloud/threefold__pricing?id=discount-levels"
-                      target="_blank"
-                      rel="noreferrer"
-                      class="has-text-white is-underlined"
-                    >
-                      Learn more</a
-                    >
-                  </strong>.
-                </div>
-              {:else}
-                Failed to load the required data.
-              {/if}
+                    Learn how to unlock discounts</a
+                  >
+                </strong>.
+              </div>
             </div>
           </b-box>
         </div>
         <div style:width="1.25rem" class="is-hidden-touch" />
         <Balance />
       </div>
-      <!-- <div class="columns is-vcentered" style:margin-bottom="10px">
-        <div class="column is-10">
-          {#each [price0K, price] as p, index}
-            <div style:margin-bottom={index === 0 ? -5 : undefined}>
-              <b-tags addons align="centered" size="large">
-                <b-tag>
-                  {@html mastodon$.value.mnemonics.valid && !loading
-                    ? index === 0
-                      ? "Based on your specifications, the standard deployment cost is "
-                      : `Because you have <strong class="mx-1"> ${balance.toFixed(
-                          2
-                        )}</strong> TFT in your TF Chain Wallet, your cost is`
-                    : ""}
-                  <strong class="mr-1 ml-1">
-                    {loading ? "Loading..." : p.toFixed(2)}
-                  </strong>
-                  {mastodon$.value.mnemonics.valid ? "USD/Month" : ""}
-                  {#if index === 1}
-                    <a
-                      href="https://library.threefold.me/info/threefold#/cloud/threefold__pricing?id=discount-levels"
-                      target="_blank"
-                      rel="noreferrer"
-                      class="ml-1"
-                    >
-                      Learn More</a
-                    >
-                  {/if}
-                </b-tag>
-              </b-tags>
-            </div>
-          {/each}
-        </div>
-        <div class="column" style:display="flex" style:justify-content="end">
-          <Balance />
-        </div>
-      </div> -->
     {/if}
   {/if}
 </div>

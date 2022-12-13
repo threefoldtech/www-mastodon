@@ -304,7 +304,7 @@
 
       <form on:submit|preventDefault={onDeploy} class="p-2">
         <section class:d-none={deploying}>
-          <Credentials {mastodon} show={active === "credentials"} />
+          <Credentials show={active === "credentials"} />
 
           {#if validCredentials}
             <Basic {mastodon} show={active === "basic"} />
