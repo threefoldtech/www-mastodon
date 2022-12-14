@@ -1,5 +1,10 @@
 # WWW-MASTODON
 
+## Table of contents
+
+1. [How to include weblet in another website?](#how-to-include-weblet-in-another-website)
+2. [Provider ID](#provider-id)
+
 ### How to include weblet in another website?
 
 1. Clone the project
@@ -48,3 +53,16 @@ yarn build
   <body>
 </html>
 ```
+
+### Provider ID
+
+If u didn't add a **Provider ID**. User will be asked to enter a valid id or stick to our default id(1).
+_image_
+
+If u add a **Provider ID**. you will get _Credentials_ as first page.
+
+```html
+<tf-mastodon provider="your-provider-id"></tf-mastodon>
+```
+
+_image_
