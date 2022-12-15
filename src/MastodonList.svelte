@@ -7,7 +7,7 @@
   import { getGrid, getNameAndGatewayContracts, mastodon } from "./utils";
   import { Decimal } from "decimal.js";
   import type { Table } from "tf-svelte-bulma-wc";
-  
+
   const { Table, btn } = window.tfSvelteBulmaWc;
   const mnemonics = mastodon.get("mnemonics");
   $: mnemonics$ = $mnemonics;
@@ -22,17 +22,17 @@
   let _index: number;
   let selectedInstances: string[] = [];
 
-  function openDeleteModal(index?: number){
+  function openDeleteModal(index?: number) {
     const indexs = typeof index === "number" ? [index] : selected;
     for (const index of indexs) {
-      if(!selectedInstances.includes(instances[index].name)){
-        selectedInstances.push(instances[index].name)
-      };
-    };
+      if (!selectedInstances.includes(instances[index].name)) {
+        selectedInstances.push(instances[index].name);
+      }
+    }
 
     _openDeleteModal = true;
-    _index = index
-  };
+    _index = index;
+  }
 
   async function onDelete(index?) {
     deleting = true;
@@ -41,26 +41,26 @@
     const grid = await getGrid(mnemonics$.value);
 
     for (const index of indexs) {
-        deletingIndex = index;
-        let contractIds = await getNameAndGatewayContracts(
-            mnemonics$.value,
-            instances[index].name
-        );
-        contractIds = contractIds.concat(instances[index].contractId);
-        await Promise.all(
-            contractIds.map((id) => {
-            return grid.contracts.cancel({ id }).catch(() => null);
-            })
-        );
-        table.unselect(index);
-        __instances[index] = null;
-    };
+      deletingIndex = index;
+      let contractIds = await getNameAndGatewayContracts(
+        mnemonics$.value,
+        instances[index].name
+      );
+      contractIds = contractIds.concat(instances[index].contractId);
+      await Promise.all(
+        contractIds.map((id) => {
+          return grid.contracts.cancel({ id }).catch(() => null);
+        })
+      );
+      table.unselect(index);
+      __instances[index] = null;
+    }
 
     table.rows = __instances.filter((x) => x !== null);
     instances = instances.filter((_, i) => __instances[i] !== null);
     deletingIndex = undefined;
     deleting = false;
-  };
+  }
 
   async function listMastodon() {
     loading = true;
@@ -103,44 +103,52 @@
 
   let selected: number[] = [];
   let deleting = false;
+  let disableReload = false;
   let deletingIndex: number;
   let table: Table;
 
   export function reload() {
     listMastodon();
   }
+
+  export function setDisabled(value: boolean) {
+    disableReload = value;
+  }
 </script>
 
-<b-box>
+<b-box class:mb-6={true} class:p-6={true} style:font-family="'Lato', sans-serif">
   <b-content>
     <div class="is-flex is-justify-content-space-between is-align-items-center">
       <h2>Deployment List (Mastodon)</h2>
-      <div>
-        <button
-          class:mr-2={true}
-          use:btn={{ color: "primary", loading, size: "small" }}
-          disabled={loading || deleting || !mnemonics$.valid}
-          on:click={listMastodon}
-        >
-          <b-icon icon="fa-solid fa-arrows-rotate" />
-          Reload
-        </button>
-        <button
-          use:btn={{ color: "danger", loading: deleting, size: "small" }}
-          disabled={deleting || selected.length === 0}
-          on:click={() => openDeleteModal()}
-        >
-          <b-icon icon="fa-solid fa-trash" />
-          Delete
-        </button>
-      </div>
+      {#if mnemonics$.valid}
+        <div>
+          <button
+            class:mr-2={true}
+            use:btn={{ color: "primary", loading, size: "small" }}
+            disabled={loading || deleting || !mnemonics$.valid || disableReload}
+            on:click={listMastodon}
+          >
+            <b-icon icon="fa-solid fa-arrows-rotate" />
+            Reload
+          </button>
+          <button
+            use:btn={{ color: "danger", loading: deleting, size: "small" }}
+            disabled={deleting || selected.length === 0}
+            on:click={() => openDeleteModal()}
+          >
+            <b-icon icon="fa-solid fa-trash" />
+            Delete
+          </button>
+        </div>
+      {/if}
     </div>
     <hr />
   </b-content>
 
   {#if !mnemonics$.valid}
     <b-notification color="info" light>
-      Please insert your mnemonics.
+      Please create account or insert your mnemonics in
+      <strong> Credentials </strong> tab.
     </b-notification>
   {:else}
     {#if loading}
@@ -162,19 +170,12 @@
             "name",
             "Public IPv4",
             "Planetary Network IP",
-            "Flist",
             "Billing Rate",
           ]}
           position={false}
           rows={instances.map((i, index) => {
             const ip = i.publicIP?.ip;
-            return [
-              i.name,
-              ip || "None",
-              i.planetary,
-              i.flist,
-              billingRate[index],
-            ];
+            return [i.name, ip || "None", i.planetary, billingRate[index]];
           })}
           actions={[
             {
@@ -184,7 +185,7 @@
               },
               color: "primary",
               icon: "fa-solid fa-eye",
-              disabled: () => deleting,
+              disabled: () => deleting || disableReload,
             },
             {
               label: "Open",
@@ -196,7 +197,7 @@
               },
               color: "link",
               icon: "fa-solid fa-link",
-              disabled: () => deleting,
+              disabled: () => deleting || disableReload,
             },
             {
               label: "Delete",
@@ -204,7 +205,7 @@
               color: "danger",
               icon: "fa-solid fa-trash",
               loading: ({ index }) => deletingIndex === index && deleting,
-              disabled: () => deleting,
+              disabled: () => deleting || disableReload,
             },
           ]}
           on:select={({ detail }) => (selected = detail)}
@@ -222,7 +223,7 @@
     {#if _openDeleteModal}
       <MastodonDeleteModal
         on:close={() => (_openDeleteModal = undefined)}
-        on:isDelete={({detail}) => {
+        on:isDelete={({ detail }) => {
           _openDeleteModal = false;
           selectedInstances = [];
           detail === true ? onDelete(_index) : false;

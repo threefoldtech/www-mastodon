@@ -1,47 +1,68 @@
-# Svelte + TS + Vite
+# WWW-MASTODON
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+## Table of contents
 
-## Recommended IDE Setup
+1. [How to include weblet in another website?](#how-to-include-weblet-in-another-website)
+2. [Provider ID](#provider-id)
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+### How to include weblet in another website?
 
-## Need an official Svelte framework?
+1. Clone the project
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+```sh
+git clone https://github.com/threefoldtech/www-mastodon.git
 
-## Technical considerations
-
-**Why use this over SvelteKit?**
-
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
-
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
-
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
-
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+# Change directory inside project
+cd ./www-mastodon
 ```
+
+2. Install project dependencies
+
+```sh
+yarn install
+```
+
+3. Build project
+
+```sh
+yarn build
+```
+
+4. Copy all files in _./dist_ folder into your project (for e.g in _./weblet_)
+
+5. Import scripts in your project
+
+```html
+<script src="./weblet/config.js"></script>
+<script defer src="./weblet/mastodon.js"></script>
+```
+
+6. Use weblet within your templates
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Code... -->
+    <script src="./weblet/config.js"></script>
+    <script defer src="./weblet/mastodon.js"></script>
+  </head>
+  <body>
+    <tf-mastodon provider="your-provider-id"></tf-mastodon>
+    <tf-mastodon-list></tf-mastodon-list>
+  <body>
+</html>
+```
+
+### Provider ID
+
+If you didn't add a **Provider ID**. User will be asked to enter a valid id or stick to our default id(1).
+![image](https://user-images.githubusercontent.com/31689104/207857124-cc5bc7e0-121c-4248-b295-c1ff8d264211.png)
+
+If you add a **Provider ID**. you will get _Credentials_ as first page.
+
+```html
+<tf-mastodon provider="your-provider-id"></tf-mastodon>
+```
+
+![image](https://user-images.githubusercontent.com/31689104/207612152-3069fc8c-25f5-49ed-a2a6-c0cdf37a7639.png)

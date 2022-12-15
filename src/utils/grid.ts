@@ -1,4 +1,4 @@
-const { GridClient, Nodes } = window.grid3_client;
+const { GridClient, Nodes, BackendStorageType } = window.grid3_client;
 import { HTTPMessageBusClient } from "ts-rmb-http-client";
 import type {
   GridClient as GC,
@@ -13,7 +13,8 @@ export function getGrid(mnemonic: string) {
     mnemonic,
     mnemonic,
     new HTTPMessageBusClient(0, "", "", ""),
-    "mastodon"
+    "mastodon",
+    BackendStorageType.tfkvstore
   );
   return grid.connect().then(() => grid);
 }

@@ -8,8 +8,8 @@
 
   export let mastodon: MastodonForm;
 
-  let price: number;
-  let price50K: number;
+  let balance: string;
+  let price0K: number;
   let loading = true;
 
   $: mastodon$ = $mastodon;
@@ -24,22 +24,16 @@
     __challenge = challenge;
 
     const grid = await getGrid(mnemonics.value);
-    price = (
-      await grid.calculator.calculateWithMyBalance({
-        cru: cpu.value,
-        sru: disk.value + 2,
-        mru: memory.value / 1024,
-        hru: 0,
-      })
-    ).sharedPrice;
 
-    price50K = (
+    balance = await grid.balance.getMyBalance().then((b) => b.free.toFixed(2));
+
+    price0K = (
       await grid.calculator.calculate({
         cru: cpu.value,
         sru: disk.value + 2,
         mru: memory.value / 1024,
         hru: 0,
-        balance: 50 * 10e3,
+        balance: 0,
       })
     ).sharedPrice;
     loading = false;
@@ -50,33 +44,43 @@
 <div>
   {#if mastodon}
     {#if mastodon$.value.mnemonics.valid}
-      <div class="columns is-vcentered" style:margin-bottom="10px">
-        <div class="column is-10">
-          {#each [price, price50K] as p, index}
-            <div style:margin-bottom={index === 0 ? -5 : undefined}>
-              <b-tags addons align="centered" size="large">
-                <b-tag>
-                  {mastodon$.value.mnemonics.valid && !loading
-                    ? "The deployment will cost "
-                    : ""}
-                  <strong class="mr-1 ml-1">
-                    {loading ? "Loading..." : p.toFixed(2)}
-                  </strong>
-                  {mastodon$.value.mnemonics.valid
-                    ? `USD/Month ${
-                        index === 1 ? "with a 50k balance of TFT, after applying discount" : ""
-                      }`
-                    : ""}
-                </b-tag>
-              </b-tags>
+      <div class="is-flex-desktop">
+        <div class="is-flex" style:width="100%">
+          <b-box
+            style:width="100%"
+            style:background-color="var(--main-purple)"
+            class:has-text-white={true}
+            class:mb-2={true}
+            class:is-flex={true}
+            class:is-align-items-center={true}
+          >
+            <div>
+              <div style:line-height="45px">
+                Based on your specifications and TFChain TFT balance, your
+                deployment cost is <strong
+                  >{loading
+                    ? "Calculating..."
+                    : price0K
+                    ? price0K
+                    : "Failed to calculate standard price"}</strong
+                >
+                USD/Month.<br />
+                <strong>
+                  <a
+                    href="https://library.threefold.me/info/threefold#/cloud/threefold__pricing?id=discount-levels"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="has-text-white is-underlined"
+                  >
+                    Learn how to unlock discounts</a
+                  >
+                </strong>.
+              </div>
             </div>
-          {/each}
+          </b-box>
         </div>
-        <div class="column" style:display="flex"
-        style:justify-content="end">
-          <Balance />
-        </div>
-
+        <div style:width="1.25rem" class="is-hidden-touch" />
+        <Balance />
       </div>
     {/if}
   {/if}
