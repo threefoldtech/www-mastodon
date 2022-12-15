@@ -25,6 +25,7 @@
   import PriceCalculator from "./components/PriceCalculator.svelte";
   import type { FormControlValue } from "tf-svelte-rx-forms/dist/types";
   import { onMount } from "svelte";
+  import { getRelays } from "./utils/helpers";
   const { Input, btn } = window.tfSvelteBulmaWc;
 
   export let provider: string;
@@ -112,7 +113,7 @@
       const vm = await deployVM({
         ...mastodon.value,
         image: {
-          flist: "https://hub.grid.tf/tf-official-apps/mastodon-latest.flist",
+          flist: "https://hub.grid.tf/omda.3bot/threefolddev-mastodon-fadivarse.flist",
           entryPoint: "/sbin/zinit init",
         },
         rootFsSize: 2,
@@ -130,6 +131,7 @@
           { key: "SUPERUSER_PASSWORD", value: value.admin.password },
           { key: "SSH_KEY", value: value.sshKey },
           { key: "IS_TF_CONNECT", value: `${value.tfConnect}` },
+          { key: "RELAYS_LINKS", value: JSON.stringify(getRelays()) },
           ...(value.smtp.enable
             ? [
                 { key: "SMTP_SERVER", value: value.smtp.server },
