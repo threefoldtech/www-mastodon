@@ -56,12 +56,13 @@ yarn build
 
 ### Provider ID
 
-If u didn't add a **Provider ID**. User will be asked to enter a valid id or stick to our default id(1).
-![image](https://user-images.githubusercontent.com/31689104/207612081-126a8a24-820a-420e-849a-5faa78df4227.png)
+If you didn't add a **Provider ID**. User will be asked to enter a valid id or stick to our default id(1).
+![image](https://user-images.githubusercontent.com/31689104/207857124-cc5bc7e0-121c-4248-b295-c1ff8d264211.png)
 
-If u add a **Provider ID**. you will get _Credentials_ as first page.
+If you add a **Provider ID**. you will get _Credentials_ as first page.
 
 ```html
 <tf-mastodon provider="your-provider-id"></tf-mastodon>
 ```
+
 ![image](https://user-images.githubusercontent.com/31689104/207612152-3069fc8c-25f5-49ed-a2a6-c0cdf37a7639.png)

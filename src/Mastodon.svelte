@@ -113,7 +113,8 @@
       const vm = await deployVM({
         ...mastodon.value,
         image: {
-          flist: "https://hub.grid.tf/omda.3bot/threefolddev-mastodon-fadivarse.flist",
+          flist:
+            "https://hub.grid.tf/omda.3bot/threefolddev-mastodon-fadivarse.flist",
           entryPoint: "/sbin/zinit init",
         },
         rootFsSize: 2,
@@ -251,7 +252,6 @@
   {#if providingSolutionCode}
     <Input
       label="Solution Code"
-      sublabel="If you don't have solution code please contact with our support."
       placeholder="Solution Code"
       controller={mastodon.get("solutionCode")}
       validation={!mastodon$.value.solutionCode.pending}
