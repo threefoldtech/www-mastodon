@@ -185,7 +185,7 @@
               },
               color: "primary",
               icon: "fa-solid fa-eye",
-              disabled: () => deleting,
+              disabled: () => deleting || disableReload,
             },
             {
               label: "Open",
@@ -197,7 +197,7 @@
               },
               color: "link",
               icon: "fa-solid fa-link",
-              disabled: () => deleting,
+              disabled: () => deleting || disableReload,
             },
             {
               label: "Delete",
@@ -205,7 +205,7 @@
               color: "danger",
               icon: "fa-solid fa-trash",
               loading: ({ index }) => deletingIndex === index && deleting,
-              disabled: () => deleting,
+              disabled: () => deleting || disableReload,
             },
           ]}
           on:select={({ detail }) => (selected = detail)}
