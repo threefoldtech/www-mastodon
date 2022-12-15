@@ -53,7 +53,7 @@
       if (farmId.value) {
         nodes = nodes.filter((node) => node.farmId === farmId.value);
         if (nodes.length === 0) {
-          const error = `No nodes with farmID(${farmId.value}) were found.`;
+          const error = `No nodes satisfy the requirement with farm(${farmId.value}) were found.`;
           controller.setValue(null, { error });
           if (farmId.getValue().error !== error) {
             farmId.setValue(farmId.value, { error });
