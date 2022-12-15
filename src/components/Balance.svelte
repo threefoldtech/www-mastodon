@@ -47,7 +47,7 @@
     <p style:white-space="nowrap">
       <strong>
         <a
-          href="https://library.threefold.me/info/manual/#/manual__tfchain_home?id=contract-grace-period"
+          href="https://library.threefold.me/info/manual/#/manual__tfchain_home?id=contract-locking"
           target="_blank"
           rel="noreferrer"
           class="is-underlined"
