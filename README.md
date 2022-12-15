@@ -57,7 +57,7 @@ yarn build
 ### Provider ID
 
 If you didn't add a **Provider ID**. User will be asked to enter a valid id or stick to our default id(1).
-![image](https://user-images.githubusercontent.com/31689104/207612081-126a8a24-820a-420e-849a-5faa78df4227.png)
+![image](https://user-images.githubusercontent.com/31689104/207857124-cc5bc7e0-121c-4248-b295-c1ff8d264211.png)
 
 If you add a **Provider ID**. you will get _Credentials_ as first page.
 
