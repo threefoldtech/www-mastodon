@@ -5,26 +5,7 @@ const NUMBERS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const ALPHA = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i));
 const ALL = [...NUMBERS, ...ALPHA];
 const relays = [
-  "https://mastodon-relay.moew.science/inbox",
   "https://relay.beckmeyer.us/inbox",
-  "https://relay.fedi.agency/inbox",
-  "https://relay.fedinet.social/inbox",
-  "https://relay.flm9.me/inbox",
-  "https://relay.froth.zone/inbox",
-  "https://relay.gruenehoelle.nl/inbox",
-  "https://relay.homunyan.com/inbox",
-  "https://relay.intahnet.co.uk/inbox",
-  "https://relay.libranet.de/inbox",
-  "https://relay.masto.la/inbox",
-  "https://relay.minecloud.ro/inbox",
-  "https://relay.mistli.net/inbox",
-  "https://relay.pissdichal.de/inbox",
-  "https://relay.toot.yukimochi.jp/inbox",
-  "https://relay.uggs.io/inbox",
-  "https://relay.wagnersnetz.de/inbox",
-  "https://relay.wig.gl/inbox",
-  "https://relay.dog/inbox",
-  "https://relay.darmstadt.social/inbox",
   "https://relay.douzepoints.social/inbox"
 ]
 
