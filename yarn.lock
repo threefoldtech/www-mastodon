@@ -1869,15 +1869,15 @@ ts-mixer@^6.0.2:
   resolved "https://registry.yarnpkg.com/ts-mixer/-/ts-mixer-6.0.2.tgz#3e4e4bb8daffb24435f6980b15204cb5b287e016"
   integrity sha512-zvHx3VM83m2WYCE8XL99uaM7mFwYSkjR2OZti98fabHrwkjsCvgwChda5xctein3xGOyaQhtTeDq/1H/GNvF3A==
 
-ts-rmb-client-base@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/ts-rmb-client-base/-/ts-rmb-client-base-0.0.1.tgz#7405aa498a50f34d562caec740bffcc25f15777a"
-  integrity sha512-xe7NxHgDyQnHTOFNfuHnhRXSY1xAEyRC/dRmCLI8H3THXLfLr3UcTqNg4Cxli0JEa2oW7s9DQvfZXek91FYo+w==
+ts-rmb-client-base@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ts-rmb-client-base/-/ts-rmb-client-base-1.0.0.tgz#8c30d62cca413713956c804da5e1e54c0770395d"
+  integrity sha512-a4jHR1P1fJYVaL88SNrgt+xHNOyrgx/vgENx/xlMDNQ7R9WVUdCTrrxQ3smCvMhsiRa2YnasuGzoIvDAbyHiDg==
 
-ts-rmb-http-client@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.0.7.tgz#1c63dc29eee2ba4917a199d7754de65375b076b7"
-  integrity sha512-rjkgV44wKloCDoXs8h+imTAjd0zX/vDdeXCPXQHuLki8Q3kRaPsaKDypEebXvDNsfkUcXMgu6GFC8yr1H/HeRw==
+ts-rmb-http-client@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.1.2.tgz#8688e2b0b6747cec7782516c5ac658b5a39b01c1"
+  integrity sha512-edFir3N8e9HGroCZ4cwVeje220Q7CE+ouVJWmB4mZvHaZecmsdA/1OA8upYIuphfk9uupYBBQCBe38bOJBAYSg==
   dependencies:
     "@polkadot/keyring" "^9.6.2"
     "@types/crypto-js" "^4.1.0"
@@ -1885,7 +1885,7 @@ ts-rmb-http-client@^1.0.7:
     buffer "^6.0.3"
     crypto-js "^4.1.1"
     js-base64 "^3.7.2"
-    ts-rmb-client-base "^0.0.1"
+    ts-rmb-client-base "1.0.0"
 
 tslib@^2.1.0, tslib@^2.4.0:
   version "2.4.1"
