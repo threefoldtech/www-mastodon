@@ -21,7 +21,7 @@
     [isNodeUp]
   );
 
-  let farmId = fb.control<number>(null, [getErrorFromCtx]);
+  const farmId = fb.control<number>(null, [getErrorFromCtx]);
   let nodes: NodeInfo[] = [];
   let farms: { name: string; farmID: number }[] = [];
 
@@ -42,13 +42,12 @@
       form.setDisabled(true);
       const nodeId = controller.value;
       controller.setValue(null);
-      farmId = form.get("farmId");
       const filters = form.value;
       delete filters.region;
       filters.mru /= 1024;
-      // delete filters.farmId;
 
       nodes = await findNodes(mastodon.value.mnemonics, filters);
+      
       if (farmId.value) {
         nodes = nodes.filter((node) => node.farmId === farmId.value);
         if (nodes.length === 0) {
