@@ -188,6 +188,15 @@
       }
     }
   }
+
+  let __mnemonicsIsValid = false;
+  $: if (!mnemonics$.valid && __mnemonicsIsValid) {
+    __mnemonicsIsValid = false;
+    mastodon.get("sshKey").reset();
+    __1 = false;
+  } else if (mnemonics$.valid && !__mnemonicsIsValid) {
+    __mnemonicsIsValid = true;
+  }
 </script>
 
 <section style:display={show ? "initial" : "none"} bind:this={self}>
