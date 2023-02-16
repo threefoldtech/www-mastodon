@@ -208,7 +208,7 @@
         sublabel="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
         type="password"
         controller={mastodon.get("mnemonics")}
-        disabled={pending || creating}
+        disabled={creating}
         validation={!(pending || creating)}
         hint={mnemonics$.pending
           ? "Validating mnemonics..."
