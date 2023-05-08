@@ -1,7 +1,7 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
 
-import type * as grid3_client from "grid3_client/dist/node";
+import type * as grid3_client from "@threefold/grid_client";
 import type * as tfSvelteBulmaWc from "tf-svelte-bulma-wc";
 import type * as tfSvelteRxForms from "tf-svelte-rx-forms";
 import type * as tsRmbHttpClient from "ts-rmb-http-client";
