@@ -18,7 +18,7 @@ export async function main() {
   window.polkadot_api = await import("@polkadot/api");
 
   download("Grid3 Client");
-  await import("grid3_client");
+  window.grid3_client = await import("@threefold/grid_client");
 
   download("Threefold Svelte Bulma Reactive Forms");
   window.tfSvelteRxForms = await import("tf-svelte-rx-forms");
