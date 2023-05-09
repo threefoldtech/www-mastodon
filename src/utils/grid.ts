@@ -10,7 +10,7 @@ export function getGrid(mnemonic: string) {
   const grid = new GridClient({
     network: window.config.network as NetworkEnv,
     mnemonic,
-    storeSecret: mnemonic,
+    storeSecret: mnemonic.length > 0 ? mnemonic : "omda",
     projectName: 'mastodon',
     backendStorageType: BackendStorageType.tfkvstore
   });
