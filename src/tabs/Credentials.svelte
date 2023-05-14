@@ -3,9 +3,10 @@
 <script lang="ts">
   import { getGrid, noBalanceMessage, Session } from "../utils";
   import Qrcode from "../components/Qrcode.svelte";
-  import type { NetworkEnv } from "grid3_client";
+  import type { NetworkEnv } from "@threefold/grid_client";
   import { onDestroy, onMount } from "svelte";
   import { mastodon } from "../utils";
+  import { default as urlParser } from "url-parse";
 
   export let show: boolean;
 
@@ -51,20 +52,24 @@
     try {
       accountCreationStatus = "Creating";
       const { GridClient } = window.grid3_client;
-      const rmb = new HTTPMessageBusClient(0, "", "", "");
-      const client = new GridClient(
-        window.config.network as NetworkEnv,
-        "",
-        "test",
-        rmb
-      );
+
+      const network = window.config.network as NetworkEnv
+      const client = new GridClient({ mnemonic: "", network, storeSecret: "omda" });
+
       client._connect();
-      const createdAccount = await client.tfchain.createAccount("::1");
+
+      const urls = client.getDefaultUrls(window.config.network as NetworkEnv);
+      const relay = urlParser(urls.relay).hostname;
+      const createdAccount = await client.tfchain.createAccount(relay);
+
       mastodon.get("mnemonics").setValue(createdAccount.mnemonic);
       await mastodon.get("mnemonics").validate();
       creationMsg =
         "Please make sure to store your mnemonics somewhere safe to be able to access your deployments later on. There is no way for neither you nor ThreeFold nor anybody else to recover lost mnemonics.";
       accountCreationStatus = "Done";
+
+      client.disconnect();
+
     } catch (e) {
       accountCreationStatus = "Error";
       creationMsg = e;
