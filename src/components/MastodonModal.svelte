@@ -96,6 +96,7 @@
                 {...input}
                 disabled
                 validation={false}
+                style="cursor: copy;"
               />
             </div>
             {#if input.url}
