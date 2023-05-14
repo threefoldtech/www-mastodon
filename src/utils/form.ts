@@ -44,7 +44,7 @@ export const mastodon = fb.group({
       },
       async (ctrl) => {
         const userBalance = await getBalance(ctrl.value);
-        if (userBalance.free < 0.001) {
+        if (userBalance.free < 1) {
           return { message: noBalanceMessage };
         }
       },
