@@ -155,7 +155,7 @@ export const mastodon = fb.group({
       generateString(15),
       [
         validators.required("Admin Password is required."),
-        validators.minLength("Admin password must be at least 6 chars.", 6),
+        validators.minLength("Admin password must be at least 6 chars.", 8),
         validators.maxLength("Admin Password can't pass 15 chars.", 15),
       ],
     ],
