@@ -12,8 +12,6 @@ import {
 } from "./validators";
 
 const { fb, validators } = window.tfSvelteRxForms;
-const { GridClient } = window.grid3_client;
-const { HTTPMessageBusClient } = window.tsRmbHttpClient;
 
 export const noBalanceMessage = "Your balance is not enough.";
 export const mastodon = fb.group({
@@ -161,29 +159,29 @@ export const mastodon = fb.group({
     ],
   }),
 
-  smtp: fb.group({
-    enable: [false],
-    email: ["", [emailValidator]],
-    password: [
-      generateString(15),
-      [
-        validators.minLength("SMTP password must be at least 6 chars.", 6),
-        validators.maxLength("SMTP Password can't pass 15 chars.", 15),
-      ],
-    ],
-    server: [
-      "",
-      [validators.isURL("Invalid SMTP server.", { require_tld: true })],
-    ],
-    port: [null as number, [validators.isPort("Invalid SMTP port.")]],
-  }),
-
   region: [null as string, [getErrorFromCtx]],
 
   certified: [false, [getErrorFromCtx]],
 
   tfConnect: [false],
 });
+export const smtpForm = fb.group({
+  enable: [false],
+  email: ["", [emailValidator]],
+  password: [
+    generateString(15),
+    [
+      validators.minLength("SMTP password must be at least 6 chars.", 6),
+      validators.maxLength("SMTP Password can't pass 15 chars.", 15),
+    ],
+  ],
+  server: [
+    "",
+    [validators.isURL("Invalid SMTP server.", { require_tld: true })],
+  ],
+  port: [null as number, [validators.isPort("Invalid SMTP port.")]],
+})
+
 
 const mnemonics = mastodon.get("mnemonics");
 let unsub: Unsubscriber;

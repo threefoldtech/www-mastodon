@@ -1,7 +1,7 @@
 <svelte:options tag="tf-mastodon" />
 
 <script context="module" lang="ts">
-  const { Tabs, btn } = window.tfSvelteBulmaWc;
+  const { Tabs } = window.tfSvelteBulmaWc;
   const { events } = window.grid3_client;
 
   import Credentials from "./tabs/Credentials.svelte";
@@ -12,6 +12,7 @@
     getDomainName,
     deployGateway,
     mastodon,
+    smtpForm,
     listenUntillUp,
     checkNode,
   } from "./utils";
@@ -44,6 +45,7 @@
   let showDeployedData = false;
   let listener: (() => void) | undefined;
   let isUp: boolean = false;
+
   async function onDeploy() {
     const { value } = mastodon;
 
@@ -59,9 +61,11 @@
       mastodon.get("certified").setValue(mastodon$.value.certified.value);
     }
 
-    if (!mastodon.valid) {
+    if (!mastodon.valid || (smtp$.value.enable.value && !smtp$.valid) ) {
       mastodon.markAsDirty();
       mastodon.markAsTouched();
+      smtpForm.markAsDirty();
+      smtpForm.markAsTouched();
 
       requestAnimationFrame(() => {
         if (basicHasError) {
@@ -82,10 +86,10 @@
             else if (!v$.memory.valid) mastodon.get("memory")["__input"]?.focus();
             else if (!v$.disk.valid) mastodon.get("disk")["__input"]?.focus();
             else if (!v$.admin.value.username.valid) mastodon.get("admin").get("username")["__input"]?.focus();
-            else if (!v$.smtp.value.email.valid) mastodon.get("smtp").get("email")["__input"]?.focus();
-            else if (!v$.smtp.value.password.valid) mastodon.get("smtp").get("password")["__input"]?.focus();
-            else if (!v$.smtp.value.server.valid) mastodon.get("smtp").get("server")["__input"]?.focus();
-            else if (!v$.smtp.value.port.valid) mastodon.get("smtp").get("port")["__input"]?.focus();
+            else if (!smtp$.value.email.valid) smtpForm.get("email")["__input"]?.focus();
+            else if (!smtp$.value.password.valid) smtpForm.get("password")["__input"]?.focus();
+            else if (!smtp$.value.server.valid) smtpForm.get("server")["__input"]?.focus();
+            else if (!smtp$.value.port.valid) smtpForm.get("port")["__input"]?.focus();
           });
           });
         }
@@ -133,12 +137,12 @@
           { key: "SSH_KEY", value: value.sshKey },
           { key: "IS_TF_CONNECT", value: `${value.tfConnect}` },
           { key: "RELAYS_LINKS", value: JSON.stringify(getRelays()) },
-          ...(value.smtp.enable
+          ...(smtp$.value.enable.value
             ? [
-                { key: "SMTP_SERVER", value: value.smtp.server },
-                { key: "SMTP_LOGIN", value: value.smtp.email },
-                { key: "SMTP_PASSWORD", value: value.smtp.password },
-                { key: "SMTP_PORT", value: value.smtp.port.toString() },
+                { key: "SMTP_SERVER", value: smtp$.value.server.value },
+                { key: "SMTP_LOGIN", value: smtp$.value.email.value },
+                { key: "SMTP_PASSWORD", value: smtp$.value.password.value },
+                { key: "SMTP_PORT", value: smtp$.value.port.value.toString() },
               ]
             : []),
         ],
@@ -194,6 +198,7 @@
   }
 
   $: v$ = mastodon$.value;
+  $: smtp$ = $smtpForm;
   $: credentialsHasError = isNotValid(v$.mnemonics, v$.sshKey);
   $: basicHasError = isNotValid(
     v$.name,
@@ -211,12 +216,12 @@
       v$.admin.value.username,
       v$.admin.value.password
     ) ||
-    (v$.smtp.value.enable.value
+    (smtp$.value.enable.value
       ? isNotValid(
-          v$.smtp.value.email,
-          v$.smtp.value.password,
-          v$.smtp.value.port,
-          v$.smtp.value.server
+          smtp$.value.email,
+          smtp$.value.password,
+          smtp$.value.port,
+          smtp$.value.server
         )
       : false);
 

@@ -31,17 +31,14 @@ const passwordReq = validators.required("SMTP Password is required.");
 const serverReq = validators.required("SMTP Server is required.");
 const portReq = validators.required("SMTP Port is required.");
 export function toggleSMTPRequired(
-  mastodon: FormGroup<{
     smtp: FormGroup<{
       email: FormControl<string>;
       password: FormControl<string>;
       server: FormControl<string>;
       port: FormControl<number>;
-    }>;
-  }>,
+    }>,
   required: boolean
 ) {
-  const smtp = mastodon.get("smtp");
   const email = smtp.get("email");
   const password = smtp.get("password");
   const server = smtp.get("server");

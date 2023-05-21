@@ -5,7 +5,7 @@
   const { Input, CheckBox } = window.tfSvelteBulmaWc;
   import SelectNodeId from "../components/SelectNodeId.svelte";
   import SelectGateway from "../components/SelectGateway.svelte";
-  import { toggleSMTPRequired } from "../utils";
+  import { toggleSMTPRequired, smtpForm } from "../utils";
   import { onDestroy, onMount } from "svelte";
   import type { Unsubscriber } from "tf-svelte-rx-forms/dist/internals/rx_store";
 
@@ -17,18 +17,17 @@
   onMount(function mount() {
     if (!mastodon) requestAnimationFrame(mount);
     let __enable: boolean;
-    unsubscribe = mastodon
-      .get("smtp")
+    unsubscribe = smtpForm
       .get("enable")
       .subscribe((v) => {
         if (__enable === v.value) return;
         __enable = v.value;
-        toggleSMTPRequired(mastodon, __enable);
+        toggleSMTPRequired(smtpForm, __enable);
       });
   });
 
-  $: mastodon$ = $mastodon;
-  $: enableSmtp = mastodon$ ? mastodon$.value.smtp.value.enable.value : false;
+  $: smtp$ = $smtpForm;
+  $: enableSmtp = smtp$ ? smtp$.value.enable.value : false;
 </script>
 
 {#if mastodon}
@@ -84,7 +83,7 @@
       >
         <CheckBox
           label="<strong>SMTP Server</strong>"
-          controller={mastodon.get("smtp").get("enable")}
+          controller={smtpForm.get("enable")}
         />
       </b-tooltip>
     </div>
@@ -93,27 +92,27 @@
       <Input
         label="SMTP Email"
         placeholder="SMTP Email"
-        controller={mastodon.get("smtp").get("email")}
+        controller={smtpForm.get("email")}
       />
 
       <Input
         label="SMTP Password"
         placeholder="SMTP Password"
         type="password"
-        controller={mastodon.get("smtp").get("password")}
+        controller={smtpForm.get("password")}
       />
 
       <Input
         label="SMTP Server"
         placeholder="SMTP Server"
-        controller={mastodon.get("smtp").get("server")}
+        controller={smtpForm.get("server")}
       />
 
       <Input
         label="SMTP Port"
         placeholder="SMTP Port"
         type="number"
-        controller={mastodon.get("smtp").get("port")}
+        controller={smtpForm.get("port")}
       />
     {/if}
   </section>
