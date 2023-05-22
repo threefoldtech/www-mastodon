@@ -16,11 +16,15 @@
     loadBalance();
   }
 
+  const roundBalance  = (balance: number): number => {
+    return Math.floor(balance * 1000 ) / 1000
+  }
+
   async function loadBalance() {
     loading = true;
     getBalance(mnemonics$.value)
       .then(({ free, feeFrozen }) => {
-        balance = { free: free, locked: feeFrozen };
+        balance = { free: roundBalance(free), locked: roundBalance(feeFrozen) };
       })
       .finally(() => {
         loading = false;
