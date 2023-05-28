@@ -118,7 +118,7 @@
         ...mastodon.value,
         image: {
           flist:
-            "https://hub.grid.tf/omda.3bot/threefolddev-getmastodon-latest.flist",
+            "https://hub.grid.tf/tf-official-apps/mastodon-latest.flist",
           entryPoint: "/sbin/zinit init",
         },
         rootFsSize: 2,
