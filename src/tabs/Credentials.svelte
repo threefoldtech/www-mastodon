@@ -51,10 +51,10 @@
   async function onCreateAccount() {
     try {
       accountCreationStatus = "Creating";
-      const { GridClient } = window.grid3_client;
+      const { GridClient, BackendStorageType } = window.grid3_client;
 
       const network = window.config.network as NetworkEnv
-      const client = new GridClient({ mnemonic: "", network, storeSecret: "omda" });
+      const client = new GridClient({ mnemonic: "", network, storeSecret: "omda", backendStorageType: BackendStorageType.tfkvstore });
 
       client._connect();
 
