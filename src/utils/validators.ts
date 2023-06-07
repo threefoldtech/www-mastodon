@@ -11,7 +11,7 @@ const EMAIL_REGEX =
 
 export function isValidSSH(message: string) {
   return (ctrl: FormControl<string>) => {
-    if (!SSH_REGEX.test(ctrl.value)) {
+    if (!SSH_REGEX.test(ctrl.value.trim())) {
       return { isValidSSH: false, message };
     }
   };
