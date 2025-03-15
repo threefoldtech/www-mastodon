@@ -30,7 +30,7 @@
     "@threefold/grid_client": "^2.0.0-rc4",
     "bip39": "^3.0.4",
     "buffer": "^6.0.3",
-    "decimal.js": "^10.4.2",
+    "decimal.js": "^10.5.0",
     "lodash": "^4.17.21",
     "qrcode": "^1.5.1",
     "tf-svelte-bulma-wc": "^1.0.10",
