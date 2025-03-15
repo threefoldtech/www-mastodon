@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@polkadot/api": "^9.10.1",
-    "@threefold/grid_client": "^2.0.0-rc4",
+    "@threefold/grid_client": "^2.6.4",
     "bip39": "^3.0.4",
     "buffer": "^6.0.3",
     "decimal.js": "^10.4.2",
