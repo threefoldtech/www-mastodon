@@ -33,7 +33,7 @@
     "decimal.js": "^10.4.2",
     "lodash": "^4.17.21",
     "qrcode": "^1.5.1",
-    "tf-svelte-bulma-wc": "^1.0.10",
+    "tf-svelte-bulma-wc": "^1.0.12",
     "tf-svelte-rx-forms": "^1.0.3",
     "tfgrid-gql": "^1.0.1",
     "ts-rmb-http-client": "^1.1.2",
